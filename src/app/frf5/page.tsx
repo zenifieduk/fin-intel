@@ -5,11 +5,11 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 
   AreaChart, Area, LineChart, Line, ScatterChart, Scatter, PieChart, Pie, Cell,
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
-  ComposedChart, Treemap
+  ComposedChart
 } from 'recharts';
 import { 
   TrendingUp, AlertTriangle, CheckCircle, Target, Trophy, DollarSign, 
-  Users, Settings, Play, Pause, Crosshair, Shield, Menu, X, BarChart3,
+  Users, Crosshair, Shield, Menu, X, BarChart3,
   PieChart as PieChartIcon, Activity, Layers, Zap, Star
 } from 'lucide-react';
 
@@ -73,7 +73,7 @@ const ClubDNAUltimateDashboard = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Preset scenarios from FRF4
-  const presetScenarios: Record<PresetType, ScenarioData> = {
+  const presetScenarios: Record<PresetType, ScenarioData> = useMemo(() => ({
     base: {
       2025: { eflLeague1Position: 3, faCupProgress: 'Round 4', eflCupProgress: '', relegatedFromChampionship: false },
       2026: { league: 'championship', position: 8, championsLeague: '', europaLeague: '', conferenceLeague: '', faCupProgress: '', eflCupProgress: '', parachutePayment: false },
@@ -89,10 +89,12 @@ const ClubDNAUltimateDashboard = () => {
       2026: { league: 'championship', position: 2, championsLeague: '', europaLeague: '', conferenceLeague: 'Conference League Semi-Final', faCupProgress: '', eflCupProgress: '', parachutePayment: false },
       2027: { league: 'premierLeague', position: 6, championsLeague: '', europaLeague: 'Europa League Group', conferenceLeague: '', faCupProgress: '', eflCupProgress: '', parachutePayment: false }
     }
-  };
+  }), []);
 
-  const currentScenario = presetScenarios[activePreset];  // Enhanced financial calculation with more detailed breakdown
-  const calculateYearlyFinancials = (yearData: YearData2025 | YearData2026 | YearData2027, year: number): FinancialData => {
+  const currentScenario = presetScenarios[activePreset];
+
+  // Enhanced financial calculation with more detailed breakdown
+  const calculateYearlyFinancials = useMemo(() => (yearData: YearData2025 | YearData2026 | YearData2027, year: number): FinancialData => {
     let broadcasting = 0;
     let commercial = 8000;
     let matchday = 3000;
@@ -191,25 +193,31 @@ const ClubDNAUltimateDashboard = () => {
       european: Math.round(european),
       total: Math.round(broadcasting + commercial + matchday + european)
     };
-  };
+  }, []);
 
   // Calculate financials for all years
   const financialData = useMemo(() => ({
     2025: calculateYearlyFinancials(currentScenario[2025], 2025),
     2026: calculateYearlyFinancials(currentScenario[2026], 2026),
     2027: calculateYearlyFinancials(currentScenario[2027], 2027)
-  }), [currentScenario]);
+  }), [currentScenario, calculateYearlyFinancials]);
 
-  const totalRevenue = financialData[2025].total + financialData[2026].total + financialData[2027].total;
-  const avgRevenue = totalRevenue / 3;
+  // Calculate total revenue
+  const totalRevenue = useMemo(() => 
+    financialData[2025].total + financialData[2026].total + financialData[2027].total,
+    [financialData]
+  );
 
-  // Enhanced compliance metrics
-  const calculateComplianceMetrics = (): ComplianceMetrics => {
+  // Calculate average revenue for compliance
+  const avgRevenue = useMemo(() => totalRevenue / 3, [totalRevenue]);
+
+  // Calculate compliance metrics
+  const calculateComplianceMetrics = useMemo(() => (): ComplianceMetrics => {
     const psr = Math.max(0, avgRevenue * 0.15 - 10000);
     const footballEarnings = Math.max(0, avgRevenue * 0.18 - 5000);
     const squadCostRatio = Math.min(70, (avgRevenue / 2000));
-    const debtToRevenue = Math.max(0, avgRevenue * 0.08 - 2000);
-    const wageToRevenue = Math.min(80, (avgRevenue / 1500));
+    const debtToRevenue = Math.min(50, (avgRevenue * 0.08));
+    const wageToRevenue = Math.min(60, (avgRevenue * 0.12));
     
     return {
       psr: {
@@ -228,19 +236,20 @@ const ClubDNAUltimateDashboard = () => {
         threshold: 70
       },
       debtToRevenue: {
-        value: Math.round(debtToRevenue),
-        status: debtToRevenue < 15000 ? 'excellent' : debtToRevenue < 30000 ? 'good' : 'monitor',
-        threshold: 35000
+        value: Math.round(debtToRevenue * 10) / 10,
+        status: debtToRevenue < 30 ? 'excellent' : debtToRevenue < 40 ? 'good' : 'monitor',
+        threshold: 50
       },
       wageToRevenue: {
         value: Math.round(wageToRevenue * 10) / 10,
-        status: wageToRevenue < 60 ? 'excellent' : wageToRevenue < 75 ? 'good' : 'monitor',
-        threshold: 80
+        status: wageToRevenue < 45 ? 'excellent' : wageToRevenue < 55 ? 'good' : 'monitor',
+        threshold: 60
       }
     };
-  };
+  }, [avgRevenue]);
 
-  const compliance = useMemo(() => calculateComplianceMetrics(), [avgRevenue]);  // Chart data preparation
+  const compliance = useMemo(() => calculateComplianceMetrics(), [calculateComplianceMetrics]);
+
   const chartData = useMemo(() => {
     // 1. Revenue projection data (line/area charts)
     const revenueProjection = [
@@ -405,7 +414,7 @@ const ClubDNAUltimateDashboard = () => {
       growthData,
       treemapData
     };
-  }, [currentScenario, financialData, compliance, totalRevenue]);
+  }, [currentScenario, financialData, compliance, totalRevenue, presetScenarios, calculateYearlyFinancials]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -433,7 +442,9 @@ const ClubDNAUltimateDashboard = () => {
       default:
         return <Target className="w-4 h-4" />;
     }
-  };  return (
+  };
+
+  return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white">
       {/* Header */}
       <div className="bg-black/20 backdrop-blur-sm border-b border-white/10">
