@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState } from 'react';
@@ -7,30 +6,30 @@ import { TrendingUp, AlertTriangle, CheckCircle, Target, Trophy, DollarSign, Use
 
 interface YearData2025 {
   eflLeague1Position: number;
-  faCupProgress: string;
-  eflCupProgress: string;
+  faCupProgress: '' | 'Round 1' | 'Round 2' | 'Round 3' | 'Round 4' | 'Round 5' | 'Quarter-Final' | 'Semi-Final' | 'Final' | 'Winner';
+  eflCupProgress: '' | 'Round 1' | 'Round 2' | 'Round 3' | 'Round 4' | 'Round 5' | 'Quarter-Final' | 'Semi-Final' | 'Final' | 'Winner';
   relegatedFromChampionship: boolean;
 }
 
 interface YearData2026 {
-  league: string;
+  league: 'championship' | 'eflLeague1' | 'eflLeague2';
   position: number;
-  championsLeague: string;
-  europaLeague: string;
-  conferenceLeague: string;
-  faCupProgress: string;
-  eflCupProgress: string;
+  championsLeague: '' | 'Conference League Group' | 'Conference League R16' | 'Conference League Quarter-Final' | 'Conference League Semi-Final' | 'Conference League Final' | 'Conference League Winner';
+  europaLeague: '' | 'Europa League Group' | 'Europa League R16' | 'Europa League Quarter-Final' | 'Europa League Semi-Final' | 'Europa League Final' | 'Europa League Winner';
+  conferenceLeague: '' | 'Conference League Group' | 'Conference League Knockout' | 'Conference League R16' | 'Conference League Quarter-Final' | 'Conference League Semi-Final' | 'Conference League Final' | 'Conference League Winner';
+  faCupProgress: '' | 'Round 1' | 'Round 2' | 'Round 3' | 'Round 4' | 'Round 5' | 'Quarter-Final' | 'Semi-Final' | 'Final' | 'Winner';
+  eflCupProgress: '' | 'Round 1' | 'Round 2' | 'Round 3' | 'Round 4' | 'Round 5' | 'Quarter-Final' | 'Semi-Final' | 'Final' | 'Winner';
   parachutePayment: boolean;
 }
 
 interface YearData2027 {
-  league: string;
+  league: 'premierLeague' | 'championship' | 'eflLeague1';
   position: number;
-  championsLeague: string;
-  europaLeague: string;
-  conferenceLeague: string;
-  faCupProgress: string;
-  eflCupProgress: string;
+  championsLeague: '' | 'Champions League Group' | 'Champions League R16' | 'Champions League Quarter-Final' | 'Champions League Semi-Final' | 'Champions League Final' | 'Champions League Winner';
+  europaLeague: '' | 'Europa League Group' | 'Europa League R16' | 'Europa League Quarter-Final' | 'Europa League Semi-Final' | 'Europa League Final' | 'Europa League Winner';
+  conferenceLeague: '' | 'Conference League Group' | 'Conference League R16' | 'Conference League Quarter-Final' | 'Conference League Semi-Final' | 'Conference League Final' | 'Conference League Winner';
+  faCupProgress: '' | 'Round 1' | 'Round 2' | 'Round 3' | 'Round 4' | 'Round 5' | 'Quarter-Final' | 'Semi-Final' | 'Final' | 'Winner';
+  eflCupProgress: '' | 'Round 1' | 'Round 2' | 'Round 3' | 'Round 4' | 'Round 5' | 'Quarter-Final' | 'Semi-Final' | 'Final' | 'Winner';
   parachutePayment: boolean;
 }
 
@@ -59,9 +58,21 @@ interface FinancialData {
   total: number;
 }
 
-type YearDataUnion = YearData2025 | YearData2026 | YearData2027;
 type StatusType = 'excellent' | 'compliant' | 'good' | 'monitor' | 'caution' | 'breach' | string;
 type PresetType = 'base' | 'low' | 'high';
+
+// Type guard functions for union type safety
+const isYearData2025 = (data: YearData2025 | YearData2026 | YearData2027): data is YearData2025 => {
+  return 'eflLeague1Position' in data;
+};
+
+const isYearData2026 = (data: YearData2025 | YearData2026 | YearData2027): data is YearData2026 => {
+  return 'league' in data && !('eflLeague1Position' in data);
+};
+
+const isYearData2027 = (data: YearData2025 | YearData2026 | YearData2027): data is YearData2027 => {
+  return 'league' in data && !('eflLeague1Position' in data);
+};
 
 const ClubDNAFinancialDashboard = () => {
   const [isLiveMode, setIsLiveMode] = useState(false);
@@ -175,7 +186,7 @@ const ClubDNAFinancialDashboard = () => {
             { value: 'premierLeague', label: 'Premier League (Promoted)' },
             { value: 'championship', label: 'EFL Championship (Playoff Failure)' }
           ];
-          positions = prev2026.league === 'premierLeague' ? Array.from({length: 20}, (_, i) => i + 1) : Array.from({length: 24}, (_, i) => i + 1);
+          positions = Array.from({length: 24}, (_, i) => i + 1); // Championship positions
         } else if (prev2026.position >= 22) {
           // Relegation from Championship
           availableLeagues = [
@@ -194,8 +205,8 @@ const ClubDNAFinancialDashboard = () => {
         positions = Array.from({length: 24}, (_, i) => i + 1);
       }
       
-      // European competitions based on cup wins or league position
-      if (prev2026.faCupProgress === 'Winner' || (prev2026.league === 'premierLeague' && prev2026.position <= 7)) {
+      // European competitions based on cup wins
+      if (prev2026.faCupProgress === 'Winner') {
         europeanComps = ['', 'Champions League Group', 'Champions League R16', 'Champions League Quarter-Final', 'Champions League Semi-Final', 'Champions League Final', 'Champions League Winner',
                         'Europa League Group', 'Europa League R16', 'Europa League Quarter-Final', 'Europa League Semi-Final', 'Europa League Final', 'Europa League Winner',
                         'Conference League Group', 'Conference League R16', 'Conference League Quarter-Final', 'Conference League Semi-Final', 'Conference League Final', 'Conference League Winner'];
@@ -213,14 +224,13 @@ const ClubDNAFinancialDashboard = () => {
   };
 
   // Calculate financial impact for each year with realistic league progression
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const calculateYearlyFinancials = (yearData: any, year: number): FinancialData => {
+  const calculateYearlyFinancials = (yearData: YearData2025 | YearData2026 | YearData2027, year: number): FinancialData => {
     let broadcasting = 0;
     let commercial = 8000;
     let matchday = 3000;
     
     // 2025: EFL League 1
-    if (year === 2025 && yearData && typeof yearData === 'object' && 'eflLeague1Position' in yearData) {
+    if (year === 2025 && isYearData2025(yearData)) {
       const position = yearData.eflLeague1Position;
       broadcasting = 2500 - (position * 50); // League 1 base revenue
       commercial = 5000;
@@ -249,7 +259,7 @@ const ClubDNAFinancialDashboard = () => {
     }
     
     // Continue with 2026 and 2027 calculations...
-    if (year === 2026 && 'league' in yearData) {
+    if (year === 2026 && isYearData2026(yearData)) {
       if (yearData.league === 'championship') {
         const position = yearData.position;
         broadcasting = 8000 - (position * 150); // Championship revenue
@@ -294,7 +304,7 @@ const ClubDNAFinancialDashboard = () => {
     }
     
     // 2027: Premier League, Championship, or League 1 based on 2026 performance
-    if (year === 2027 && 'league' in yearData) {
+    if (year === 2027 && isYearData2027(yearData)) {
       if (yearData.league === 'premierLeague') {
         const position = yearData.position;
         broadcasting = 100000 + (21 - position) * 2000; // Premier League revenue
@@ -459,7 +469,7 @@ const ClubDNAFinancialDashboard = () => {
       // Auto-update subsequent years based on realistic progression
       if (year === 2025) {
         // Update 2026 based on 2025 League 1 performance
-        const pos2025 = parseInt(value);
+        const pos2025 = typeof value === 'number' ? value : parseInt(value);
         if (field === 'eflLeague1Position') {
           if (pos2025 <= 2) {
             // Automatic promotion
@@ -779,7 +789,7 @@ const ClubDNAFinancialDashboard = () => {
                     </h4>
                     
                     <div className="space-y-3">
-                      {year === 2025 && (
+                      {year === 2025 && isYearData2025(yearData) && (
                         <>
                           <div>
                             <label className="text-sm font-medium text-blue-200 block mb-1">EFL League 1 Position</label>
@@ -828,7 +838,7 @@ const ClubDNAFinancialDashboard = () => {
                         </>
                       )}
 
-                      {year === 2026 && (
+                      {year === 2026 && isYearData2026(yearData) && (
                         <>
                           <div>
                             <label className="text-sm font-medium text-blue-200 block mb-1">League Division</label>
@@ -881,7 +891,7 @@ const ClubDNAFinancialDashboard = () => {
                         </>
                       )}
 
-                      {year === 2027 && (
+                      {year === 2027 && isYearData2027(yearData) && (
                         <>
                           <div>
                             <label className="text-sm font-medium text-blue-200 block mb-1">League Division</label>
@@ -960,8 +970,8 @@ const ClubDNAFinancialDashboard = () => {
                         <div className="text-blue-200 text-sm">Total Revenue</div>
                         <div className="text-xs text-gray-300 mt-1">
                           {year === 2025 ? 'EFL League 1' : 
-                           year === 2026 ? (yearData.league === 'championship' ? 'Championship' : yearData.league === 'eflLeague1' ? 'League 1' : 'League 2') :
-                           yearData.league === 'premierLeague' ? 'Premier League' : yearData.league === 'championship' ? 'Championship' : 'League 1'}
+                           year === 2026 && isYearData2026(yearData) ? (yearData.league === 'championship' ? 'Championship' : yearData.league === 'eflLeague1' ? 'League 1' : 'League 2') :
+                           year === 2027 && isYearData2027(yearData) ? (yearData.league === 'premierLeague' ? 'Premier League' : yearData.league === 'championship' ? 'Championship' : 'League 1') : ''}
                         </div>
                       </div>
                     </div>
@@ -1058,7 +1068,7 @@ const ClubDNAFinancialDashboard = () => {
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
                 <XAxis dataKey="year" stroke="#ffffff80" />
-                <YAxis stroke="#ffffff80" tickFormatter={(value) => `£${(value/1000).toFixed(0)}k`} />
+                <YAxis stroke="#ffffff80" tickFormatter={(value) => `£${(Number(value)/1000).toFixed(0)}k`} />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: '#1e293b', 
@@ -1066,7 +1076,7 @@ const ClubDNAFinancialDashboard = () => {
                     borderRadius: '8px',
                     color: '#ffffff'
                   }}
-                  formatter={(value) => [`£${(value/1000).toFixed(0)}k`, '']}
+                  formatter={(value) => [`£${(Number(value)/1000).toFixed(0)}k`, '']}
                 />
                 <Legend />
                 <Area type="monotone" dataKey="revenue" stroke="#3b82f6" fill="url(#revenueGrad)" name="Total Revenue" />
@@ -1084,7 +1094,7 @@ const ClubDNAFinancialDashboard = () => {
               <BarChart data={projectionData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
                 <XAxis dataKey="year" stroke="#ffffff80" />
-                <YAxis stroke="#ffffff80" tickFormatter={(value) => `£${(value/1000).toFixed(0)}k`} />
+                <YAxis stroke="#ffffff80" tickFormatter={(value) => `£${(Number(value)/1000).toFixed(0)}k`} />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: '#1e293b', 
@@ -1092,7 +1102,7 @@ const ClubDNAFinancialDashboard = () => {
                     borderRadius: '8px',
                     color: '#ffffff'
                   }}
-                  formatter={(value) => [`£${(value/1000).toFixed(0)}k`, '']}
+                  formatter={(value) => [`£${(Number(value)/1000).toFixed(0)}k`, '']}
                 />
                 <Legend />
                 <Bar dataKey="broadcasting" stackId="a" fill="#3b82f6" name="Broadcasting" />
