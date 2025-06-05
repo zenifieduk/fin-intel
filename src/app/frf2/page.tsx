@@ -1,13 +1,16 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, RadialBarChart, RadialBar } from 'recharts';
-import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, Trophy, DollarSign, Users, Calendar, Zap, Settings, Play, Pause } from 'lucide-react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { TrendingUp, AlertTriangle, CheckCircle, Target, DollarSign, Users, Settings, Trophy, Play, Pause } from 'lucide-react';
 
 const ClubDNAFinancialDashboard = () => {
   const [isLiveMode, setIsLiveMode] = useState(false);
-  const [selectedMetric, setSelectedMetric] = useState('revenue');
-  const [animationSpeed, setAnimationSpeed] = useState(1000);
+  const [recentlyUpdated, setRecentlyUpdated] = useState<string[]>([]);
+  const [previousFinancialData, setPreviousFinancialData] = useState<{
+    revenue: { broadcasting: number; commercial: number; matchday: number; total: number }
+  } | null>(null);
+  const [changePercentages, setChangePercentages] = useState<Record<string, number>>({});
   
   // Interactive scenario state
   const [currentScenario, setCurrentScenario] = useState({
@@ -35,7 +38,6 @@ const ClubDNAFinancialDashboard = () => {
 
   // Calculate financial impact based on current scenario
   const calculateFinancialImpact = (scenario: typeof currentScenario) => {
-    let baseRevenue = 50000; // Base club revenue
     let broadcasting = 0;
     let commercial = 15000;
     let matchday = 5000;
@@ -158,6 +160,45 @@ const ClubDNAFinancialDashboard = () => {
 
   const financialData = calculateFinancialImpact(currentScenario);
 
+  // Track changes for visual feedback
+  useEffect(() => {
+    if (previousFinancialData) {
+      const updated: string[] = [];
+      const changes: Record<string, number> = {};
+      
+      // Check revenue changes
+      if (financialData.revenue.total !== previousFinancialData.revenue.total) {
+        updated.push('total-revenue');
+        changes['total-revenue'] = ((financialData.revenue.total - previousFinancialData.revenue.total) / previousFinancialData.revenue.total) * 100;
+      }
+      if (financialData.revenue.broadcasting !== previousFinancialData.revenue.broadcasting) {
+        updated.push('broadcasting');
+        changes['broadcasting'] = ((financialData.revenue.broadcasting - previousFinancialData.revenue.broadcasting) / previousFinancialData.revenue.broadcasting) * 100;
+      }
+      if (financialData.revenue.commercial !== previousFinancialData.revenue.commercial) {
+        updated.push('commercial');
+        changes['commercial'] = ((financialData.revenue.commercial - previousFinancialData.revenue.commercial) / previousFinancialData.revenue.commercial) * 100;
+      }
+      if (financialData.revenue.matchday !== previousFinancialData.revenue.matchday) {
+        updated.push('matchday');
+        changes['matchday'] = ((financialData.revenue.matchday - previousFinancialData.revenue.matchday) / previousFinancialData.revenue.matchday) * 100;
+      }
+      
+      setRecentlyUpdated(updated);
+      setChangePercentages(changes);
+      
+      // Clear highlight after 3 seconds
+      const timer = setTimeout(() => {
+        setRecentlyUpdated([]);
+        setChangePercentages({});
+      }, 3000);
+      
+      return () => clearTimeout(timer);
+    }
+    
+    setPreviousFinancialData(financialData);
+  }, [financialData, previousFinancialData]);
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'excellent': return 'text-green-600 bg-green-50';
@@ -200,21 +241,15 @@ const ClubDNAFinancialDashboard = () => {
     { name: 'Phil Clarke', position: 'Midfielder', metric: `${Math.round(financialData.players.philClarke.appearances)} apps`, bonus: financialData.players.philClarke.bonus }
   ];
 
-  const complianceData = [
-    { metric: 'PSR', value: (financialData.compliance.psr.value / financialData.compliance.psr.threshold * 100), fill: financialData.compliance.psr.status === 'compliant' ? '#10b981' : '#f59e0b' },
-    { metric: 'Football Earnings', value: (financialData.compliance.footballEarnings.value / financialData.compliance.footballEarnings.threshold * 100), fill: financialData.compliance.footballEarnings.status === 'compliant' ? '#10b981' : '#f59e0b' },
-    { metric: 'Squad Cost Ratio', value: (financialData.compliance.squadCostRatio.value / financialData.compliance.squadCostRatio.threshold * 100), fill: '#10b981' }
-  ];
 
+
+  // Live mode simulation (currently disabled - would connect to real data feeds)
   useEffect(() => {
     if (isLiveMode) {
-      const interval = setInterval(() => {
-        // Simulate live updates with small variations
-        // In a real implementation, this would connect to live data feeds
-      }, animationSpeed);
-      return () => clearInterval(interval);
+      // In a real implementation, this would connect to live data feeds
+      // For now, the real-time updates are handled by scenario changes
     }
-  }, [isLiveMode, animationSpeed]);
+  }, [isLiveMode]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white">
@@ -244,7 +279,7 @@ const ClubDNAFinancialDashboard = () => {
                 <span>{isLiveMode ? 'Live Mode' : 'Static Mode'}</span>
               </button>
               <div className="text-sm text-blue-200">
-                Season: 2024/25 • Week 23 • {new Date().toLocaleDateString()}
+                Season: 2024/25 • Week 23 • {new Date().toLocaleDateString('en-GB')}
               </div>
             </div>
           </div>
@@ -414,7 +449,14 @@ const ClubDNAFinancialDashboard = () => {
                 <DollarSign className="w-6 h-6 text-blue-400" />
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold">£{(financialData.revenue.total / 1000).toFixed(0)}k</div>
+                <div className={`text-2xl font-bold transition-all duration-500 ${
+                  recentlyUpdated.includes('total-revenue') ? 'scale-110 text-blue-300' : 'scale-100'
+                }`}>
+                  £{(financialData.revenue.total / 1000).toFixed(0)}k
+                  {recentlyUpdated.includes('total-revenue') && (
+                    <span className="ml-1 text-lg animate-bounce">💰</span>
+                  )}
+                </div>
                 <div className="text-blue-200 text-sm">Total Revenue</div>
               </div>
             </div>
@@ -479,24 +521,130 @@ const ClubDNAFinancialDashboard = () => {
             <h3 className="text-xl font-semibold mb-6 flex items-center">
               <TrendingUp className="w-5 h-5 mr-2 text-blue-400" />
               Real-time Financial Impact
+              <div className="ml-3 flex items-center">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="ml-2 text-xs text-green-400 font-medium">LIVE</span>
+              </div>
             </h3>
             <div className="space-y-4">
-              <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
-                <span className="text-blue-200">Broadcasting Revenue</span>
-                <span className="text-xl font-bold text-blue-400">£{(financialData.revenue.broadcasting / 1000).toFixed(0)}k</span>
+              <div className={`flex justify-between items-center p-3 rounded-lg transition-all duration-500 ${
+                recentlyUpdated.includes('broadcasting') 
+                  ? 'bg-blue-500/30 border-2 border-blue-400 shadow-lg shadow-blue-400/20' 
+                  : 'bg-white/5'
+              }`}>
+                <span className="text-blue-200 flex items-center">
+                  Broadcasting Revenue
+                  {recentlyUpdated.includes('broadcasting') && (
+                    <div className="ml-2 w-1 h-1 bg-blue-400 rounded-full animate-ping"></div>
+                  )}
+                </span>
+                                 <div className="flex items-center">
+                   {recentlyUpdated.includes('broadcasting') && changePercentages['broadcasting'] && (
+                     <div className="mr-2 text-sm text-blue-300 animate-pulse">
+                       {changePercentages['broadcasting'] > 0 ? '↗' : '↘'} 
+                       {Math.abs(changePercentages['broadcasting']).toFixed(1)}%
+                     </div>
+                   )}
+                   <span className={`text-xl font-bold text-blue-400 transition-all duration-500 ${
+                     recentlyUpdated.includes('broadcasting') ? 'scale-110' : 'scale-100'
+                   }`}>
+                     £{(financialData.revenue.broadcasting / 1000).toFixed(0)}k
+                   </span>
+                 </div>
               </div>
-              <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
-                <span className="text-green-200">Commercial Revenue</span>
-                <span className="text-xl font-bold text-green-400">£{(financialData.revenue.commercial / 1000).toFixed(0)}k</span>
+              
+              <div className={`flex justify-between items-center p-3 rounded-lg transition-all duration-500 ${
+                recentlyUpdated.includes('commercial') 
+                  ? 'bg-green-500/30 border-2 border-green-400 shadow-lg shadow-green-400/20' 
+                  : 'bg-white/5'
+              }`}>
+                <span className="text-green-200 flex items-center">
+                  Commercial Revenue
+                  {recentlyUpdated.includes('commercial') && (
+                    <div className="ml-2 w-1 h-1 bg-green-400 rounded-full animate-ping"></div>
+                  )}
+                </span>
+                                 <div className="flex items-center">
+                   {recentlyUpdated.includes('commercial') && changePercentages['commercial'] && (
+                     <div className="mr-2 text-sm text-green-300 animate-pulse">
+                       {changePercentages['commercial'] > 0 ? '↗' : '↘'} 
+                       {Math.abs(changePercentages['commercial']).toFixed(1)}%
+                     </div>
+                   )}
+                   <span className={`text-xl font-bold text-green-400 transition-all duration-500 ${
+                     recentlyUpdated.includes('commercial') ? 'scale-110' : 'scale-100'
+                   }`}>
+                     £{(financialData.revenue.commercial / 1000).toFixed(0)}k
+                   </span>
+                 </div>
               </div>
-              <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
-                <span className="text-yellow-200">Matchday Revenue</span>
-                <span className="text-xl font-bold text-yellow-400">£{(financialData.revenue.matchday / 1000).toFixed(0)}k</span>
+              
+              <div className={`flex justify-between items-center p-3 rounded-lg transition-all duration-500 ${
+                recentlyUpdated.includes('matchday') 
+                  ? 'bg-yellow-500/30 border-2 border-yellow-400 shadow-lg shadow-yellow-400/20' 
+                  : 'bg-white/5'
+              }`}>
+                <span className="text-yellow-200 flex items-center">
+                  Matchday Revenue
+                  {recentlyUpdated.includes('matchday') && (
+                    <div className="ml-2 w-1 h-1 bg-yellow-400 rounded-full animate-ping"></div>
+                  )}
+                </span>
+                                 <div className="flex items-center">
+                   {recentlyUpdated.includes('matchday') && changePercentages['matchday'] && (
+                     <div className="mr-2 text-sm text-yellow-300 animate-pulse">
+                       {changePercentages['matchday'] > 0 ? '↗' : '↘'} 
+                       {Math.abs(changePercentages['matchday']).toFixed(1)}%
+                     </div>
+                   )}
+                   <span className={`text-xl font-bold text-yellow-400 transition-all duration-500 ${
+                     recentlyUpdated.includes('matchday') ? 'scale-110' : 'scale-100'
+                   }`}>
+                     £{(financialData.revenue.matchday / 1000).toFixed(0)}k
+                   </span>
+                 </div>
               </div>
-              <div className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg border border-white/20">
-                <span className="text-white font-semibold">Total Revenue</span>
-                <span className="text-2xl font-bold text-white">£{(financialData.revenue.total / 1000).toFixed(0)}k</span>
+              
+              <div className={`flex justify-between items-center p-4 rounded-lg border transition-all duration-500 ${
+                recentlyUpdated.includes('total-revenue') 
+                  ? 'bg-gradient-to-r from-purple-500/40 to-blue-500/40 border-purple-400 shadow-xl shadow-purple-400/30' 
+                  : 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-white/20'
+              }`}>
+                <span className="text-white font-semibold flex items-center">
+                  Total Revenue
+                  {recentlyUpdated.includes('total-revenue') && (
+                    <div className="ml-2 w-1 h-1 bg-white rounded-full animate-ping"></div>
+                  )}
+                </span>
+                                 <div className="flex items-center">
+                   {recentlyUpdated.includes('total-revenue') && changePercentages['total-revenue'] && (
+                     <div className="mr-3 text-white/80 animate-pulse">
+                       <div className="text-lg">{changePercentages['total-revenue'] > 0 ? '📈' : '📉'}</div>
+                       <div className="text-xs">
+                         {changePercentages['total-revenue'] > 0 ? '+' : ''}{changePercentages['total-revenue'].toFixed(1)}%
+                       </div>
+                     </div>
+                   )}
+                   <span className={`text-2xl font-bold text-white transition-all duration-500 ${
+                     recentlyUpdated.includes('total-revenue') ? 'scale-110 text-shadow-lg' : 'scale-100'
+                   }`}>
+                     £{(financialData.revenue.total / 1000).toFixed(0)}k
+                   </span>
+                 </div>
               </div>
+            </div>
+            
+            {/* Real-time impact summary */}
+            <div className="mt-4 p-3 bg-white/5 rounded-lg border border-white/10">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-300">Last Updated:</span>
+                <span className="text-blue-400 font-mono">{new Date().toLocaleTimeString('en-GB', { hour12: false })}</span>
+              </div>
+              {recentlyUpdated.length > 0 && (
+                <div className="mt-2 text-xs text-green-400">
+                  ⚡ {recentlyUpdated.length} metric{recentlyUpdated.length !== 1 ? 's' : ''} updated
+                </div>
+              )}
             </div>
           </div>
 
