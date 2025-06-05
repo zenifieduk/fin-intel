@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { TrendingUp, AlertTriangle, CheckCircle, Target, DollarSign, Users, Settings, Trophy, Play, Pause } from 'lucide-react';
 
@@ -12,6 +12,7 @@ const ClubDNAFinancialDashboard = () => {
   } | null>(null);
   const [changePercentages, setChangePercentages] = useState<Record<string, number>>({});
   const [lastUpdated, setLastUpdated] = useState<string>('--:--:--');
+  const [currentDate, setCurrentDate] = useState<string>('');
   
   // Interactive scenario state
   const [currentScenario, setCurrentScenario] = useState({
@@ -38,7 +39,7 @@ const ClubDNAFinancialDashboard = () => {
   };
 
   // Calculate financial impact based on current scenario
-  const calculateFinancialImpact = (scenario: typeof currentScenario) => {
+  const calculateFinancialImpact = useCallback((scenario: typeof currentScenario) => {
     let broadcasting = 0;
     let commercial = 15000;
     let matchday = 5000;
@@ -157,9 +158,9 @@ const ClubDNAFinancialDashboard = () => {
         }
       }
     };
-  };
+  }, []); // Empty dependency array since this function doesn't depend on any changing values
 
-  const financialData = calculateFinancialImpact(currentScenario);
+  const financialData = useMemo(() => calculateFinancialImpact(currentScenario), [currentScenario, calculateFinancialImpact]);
 
   // Track changes for visual feedback
   useEffect(() => {
@@ -170,36 +171,49 @@ const ClubDNAFinancialDashboard = () => {
       // Check revenue changes
       if (financialData.revenue.total !== previousFinancialData.revenue.total) {
         updated.push('total-revenue');
-        changes['total-revenue'] = ((financialData.revenue.total - previousFinancialData.revenue.total) / previousFinancialData.revenue.total) * 100;
+        changes['total-revenue'] = previousFinancialData.revenue.total > 0 
+          ? ((financialData.revenue.total - previousFinancialData.revenue.total) / previousFinancialData.revenue.total) * 100
+          : 0;
       }
       if (financialData.revenue.broadcasting !== previousFinancialData.revenue.broadcasting) {
         updated.push('broadcasting');
-        changes['broadcasting'] = ((financialData.revenue.broadcasting - previousFinancialData.revenue.broadcasting) / previousFinancialData.revenue.broadcasting) * 100;
+        changes['broadcasting'] = previousFinancialData.revenue.broadcasting > 0 
+          ? ((financialData.revenue.broadcasting - previousFinancialData.revenue.broadcasting) / previousFinancialData.revenue.broadcasting) * 100
+          : 0;
       }
       if (financialData.revenue.commercial !== previousFinancialData.revenue.commercial) {
         updated.push('commercial');
-        changes['commercial'] = ((financialData.revenue.commercial - previousFinancialData.revenue.commercial) / previousFinancialData.revenue.commercial) * 100;
+        changes['commercial'] = previousFinancialData.revenue.commercial > 0 
+          ? ((financialData.revenue.commercial - previousFinancialData.revenue.commercial) / previousFinancialData.revenue.commercial) * 100
+          : 0;
       }
       if (financialData.revenue.matchday !== previousFinancialData.revenue.matchday) {
         updated.push('matchday');
-        changes['matchday'] = ((financialData.revenue.matchday - previousFinancialData.revenue.matchday) / previousFinancialData.revenue.matchday) * 100;
+        changes['matchday'] = previousFinancialData.revenue.matchday > 0 
+          ? ((financialData.revenue.matchday - previousFinancialData.revenue.matchday) / previousFinancialData.revenue.matchday) * 100
+          : 0;
       }
       
-      setRecentlyUpdated(updated);
-      setChangePercentages(changes);
-      setLastUpdated(new Date().toLocaleTimeString('en-GB', { hour12: false }));
-      
-      // Clear highlight after 3 seconds
-      const timer = setTimeout(() => {
-        setRecentlyUpdated([]);
-        setChangePercentages({});
-      }, 3000);
-      
-      return () => clearTimeout(timer);
+      if (updated.length > 0) {
+        setRecentlyUpdated(updated);
+        setChangePercentages(changes);
+        setLastUpdated(new Date().toLocaleTimeString('en-GB', { hour12: false }));
+        
+        // Clear highlight after 3 seconds
+        const timer = setTimeout(() => {
+          setRecentlyUpdated([]);
+          setChangePercentages({});
+        }, 3000);
+        
+        return () => clearTimeout(timer);
+      }
     }
-    
+  }, [financialData, previousFinancialData]);
+
+  // Update previous data separately to avoid infinite loops
+  useEffect(() => {
     setPreviousFinancialData(financialData);
-  }, [financialData]);
+  }, [financialData]); // Track financial data changes but guard against infinite loops with the check above
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -245,17 +259,29 @@ const ClubDNAFinancialDashboard = () => {
 
 
 
-  // Initialize timestamp on client side to avoid hydration mismatch
+  // Initialize timestamp and date on client side to avoid hydration mismatch
   useEffect(() => {
     setLastUpdated(new Date().toLocaleTimeString('en-GB', { hour12: false }));
-  }, []);
+    setCurrentDate(new Date().toLocaleDateString('en-GB'));
+  }, []); // Empty dependency array ensures this runs only once
 
   // Live mode simulation (currently disabled - would connect to real data feeds)
   useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    
     if (isLiveMode) {
       // In a real implementation, this would connect to live data feeds
-      // For now, the real-time updates are handled by scenario changes
+      // For now, just update the timestamp every 5 seconds to show it's "live"
+      interval = setInterval(() => {
+        setLastUpdated(new Date().toLocaleTimeString('en-GB', { hour12: false }));
+      }, 5000);
     }
+    
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
   }, [isLiveMode]);
 
   return (
@@ -286,7 +312,7 @@ const ClubDNAFinancialDashboard = () => {
                 <span>{isLiveMode ? 'Live Mode' : 'Static Mode'}</span>
               </button>
               <div className="text-sm text-blue-200">
-                Season: 2024/25 • Week 23 • {new Date().toLocaleDateString('en-GB')}
+                Season: 2024/25 • Week 23 • {currentDate || '--/--/----'}
               </div>
             </div>
           </div>

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, RadialBarChart, RadialBar } from 'recharts';
-import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, Trophy, DollarSign, Users, Calendar, Zap, Settings, Play, Pause } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, Trophy, DollarSign, Users, Calendar, Zap, Settings, Play, Pause, Crown, Shield, Crosshair } from 'lucide-react';
 
 type ScenarioKey = 'base' | 'low' | 'high';
 
@@ -43,6 +43,7 @@ const ClubDNAFinancialDashboard = () => {
   const [isLiveMode, setIsLiveMode] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState('revenue');
   const [animationSpeed, setAnimationSpeed] = useState(1000);
+  const [currentDate, setCurrentDate] = useState<string>('');
 
   // Extracted financial model data from the Excel file
   const financialModel = {
@@ -54,10 +55,10 @@ const ClubDNAFinancialDashboard = () => {
         championsLeague: "League Stage",
         europaLeague: "Quarter-Final",
         revenue: {
-          broadcasting: 97658,
-          commercial: 15000,
-          matchday: 7273,
-          total: 119931
+          broadcasting: 130000,
+          commercial: 25000,
+          matchday: 12000,
+          total: 167000
         },
         compliance: {
           psr: { value: 15000, status: "compliant", threshold: 105000 },
@@ -79,10 +80,10 @@ const ClubDNAFinancialDashboard = () => {
         championsLeague: "Play-Off Exit",
         europaLeague: "Play-Off",
         revenue: {
-          broadcasting: 111021,
-          commercial: 25000,
-          matchday: 8157,
-          total: 194178
+          broadcasting: 85000,
+          commercial: 15000,
+          matchday: 8000,
+          total: 108000
         },
         compliance: {
           psr: { value: 190147, status: "monitor", threshold: 105000 },
@@ -104,10 +105,10 @@ const ClubDNAFinancialDashboard = () => {
         championsLeague: "Champions",
         europaLeague: "N/A",
         revenue: {
-          broadcasting: 150455,
-          commercial: 45000,
-          matchday: 38158,
-          total: 233613
+          broadcasting: 180000,
+          commercial: 55000,
+          matchday: 25000,
+          total: 260000
         },
         compliance: {
           psr: { value: 229582, status: "monitor", threshold: 105000 },
@@ -125,22 +126,22 @@ const ClubDNAFinancialDashboard = () => {
     },
     projections: {
       base: [
-        { year: 'FY 2025', revenue: 119931, costs: 85000, profit: 34931, psr: 15000 },
-        { year: 'FY 2026', revenue: 125000, costs: 90000, profit: 35000, psr: 42000 },
-        { year: 'FY 2027', revenue: 131000, costs: 95000, profit: 36000, psr: 78000 },
-        { year: 'FY 2028', revenue: 137000, costs: 100000, profit: 37000, psr: 115000 }
+        { year: 'FY 2025', revenue: 167000, costs: 85000, profit: 82000, psr: 15000 },
+        { year: 'FY 2026', revenue: 175000, costs: 90000, profit: 85000, psr: 42000 },
+        { year: 'FY 2027', revenue: 183000, costs: 95000, profit: 88000, psr: 78000 },
+        { year: 'FY 2028', revenue: 191000, costs: 100000, profit: 91000, psr: 115000 }
       ],
       low: [
-        { year: 'FY 2025', revenue: 194178, costs: 140000, profit: 54178, psr: 190147 },
-        { year: 'FY 2026', revenue: 201840, costs: 145000, profit: 56840, psr: 246987 },
-        { year: 'FY 2027', revenue: 194245, costs: 150000, profit: 44245, psr: 291232 },
-        { year: 'FY 2028', revenue: 178141, costs: 155000, profit: 23141, psr: 314373 }
+        { year: 'FY 2025', revenue: 108000, costs: 80000, profit: 28000, psr: 190147 },
+        { year: 'FY 2026', revenue: 112000, costs: 85000, profit: 27000, psr: 246987 },
+        { year: 'FY 2027', revenue: 115000, costs: 90000, profit: 25000, psr: 291232 },
+        { year: 'FY 2028', revenue: 118000, costs: 95000, profit: 23000, psr: 314373 }
       ],
       high: [
-        { year: 'FY 2025', revenue: 233613, costs: 180000, profit: 53613, psr: 229582 },
-        { year: 'FY 2026', revenue: 260843, costs: 185000, profit: 75843, psr: 305425 },
-        { year: 'FY 2027', revenue: 221409, costs: 190000, profit: 31409, psr: 336834 },
-        { year: 'FY 2028', revenue: 155455, costs: 195000, profit: -39545, psr: 297289 }
+        { year: 'FY 2025', revenue: 260000, costs: 180000, profit: 80000, psr: 229582 },
+        { year: 'FY 2026', revenue: 285000, costs: 185000, profit: 100000, psr: 305425 },
+        { year: 'FY 2027', revenue: 295000, costs: 190000, profit: 105000, psr: 336834 },
+        { year: 'FY 2028', revenue: 305000, costs: 195000, profit: 110000, psr: 297289 }
       ]
     }
   };
@@ -196,6 +197,11 @@ const ClubDNAFinancialDashboard = () => {
     { metric: 'Squad Cost Ratio', value: (currentScenario.compliance.squadCostRatio.value / currentScenario.compliance.squadCostRatio.threshold * 100), fill: '#10b981' }
   ];
 
+  // Initialize date on client side to avoid hydration mismatch
+  useEffect(() => {
+    setCurrentDate(new Date().toLocaleDateString('en-GB'));
+  }, []);
+
   useEffect(() => {
     if (isLiveMode) {
       const interval = setInterval(() => {
@@ -234,7 +240,7 @@ const ClubDNAFinancialDashboard = () => {
                 <span>{isLiveMode ? 'Live Mode' : 'Static Mode'}</span>
               </button>
               <div className="text-sm text-blue-200">
-                Season: 2024/25 • Week 23 • {new Date().toLocaleDateString()}
+                Season: 2024/25 • Week 23 • {currentDate || '--/--/----'}
               </div>
             </div>
           </div>
@@ -258,7 +264,9 @@ const ClubDNAFinancialDashboard = () => {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-xl font-bold">{scenario.name}</h3>
                   <div className="text-2xl">
-                    {key === 'high' ? '🏆' : key === 'low' ? '⚠️' : '🎯'}
+                    {key === 'high' ? <Crown className="w-8 h-8 text-yellow-400" /> : 
+                     key === 'low' ? <Shield className="w-8 h-8 text-orange-400" /> : 
+                     <Crosshair className="w-8 h-8 text-blue-400" />}
                   </div>
                 </div>
                 <p className="text-blue-200 mb-4">{scenario.description}</p>
