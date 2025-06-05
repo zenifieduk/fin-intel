@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, AreaChart, Area } from 'recharts';
-import { TrendingUp, AlertTriangle, CheckCircle, Target, Trophy, DollarSign, Users, Calendar, Settings, Play, Pause, Crown, Shield, Crosshair } from 'lucide-react';
+import { TrendingUp, AlertTriangle, CheckCircle, Target, Trophy, DollarSign, Users, Calendar, Settings, Play, Pause, Crown, Shield, Crosshair, Star } from 'lucide-react';
 
 interface YearData {
   premierLeague: string | number;
@@ -631,7 +631,7 @@ const ClubDNAFinancialDashboard = () => {
             <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg p-4 border border-white/20">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="font-semibold">Key Player Bonuses</h4>
-                <div className="text-2xl">⭐</div>
+                <Star className="w-6 h-6 text-yellow-400" />
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
@@ -656,7 +656,7 @@ const ClubDNAFinancialDashboard = () => {
             <div className="bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-lg p-4 border border-white/20">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="font-semibold">Team Achievement</h4>
-                <div className="text-2xl">🏆</div>
+                <Trophy className="w-6 h-6 text-yellow-400" />
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
@@ -681,7 +681,7 @@ const ClubDNAFinancialDashboard = () => {
             <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-lg p-4 border border-white/20">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="font-semibold">Squad Development</h4>
-                <div className="text-2xl">📈</div>
+                <TrendingUp className="w-6 h-6 text-green-400" />
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
