@@ -1,10 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
-import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, Trophy, DollarSign, Users, Calendar, Settings, Play, Pause, Crosshair, Shield, Menu, X } from 'lucide-react';
-
-type ScenarioYear = 2025 | 2026 | 2027;
+import React, { useState } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { TrendingUp, AlertTriangle, CheckCircle, Target, Trophy, DollarSign, Users, Settings, Play, Pause, Crosshair, Shield, Menu, X } from 'lucide-react';
 
 interface YearData2025 {
   eflLeague1Position: number;
@@ -44,6 +42,7 @@ interface ScenarioData {
 const ClubDNAFinancialDashboard = () => {
   const [isLiveMode, setIsLiveMode] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activePreset, setActivePreset] = useState<string>('base');
   const [currentScenario, setCurrentScenario] = useState<ScenarioData>({
     2025: {
       eflLeague1Position: 3, // Starting in EFL League 1
@@ -477,26 +476,27 @@ const ClubDNAFinancialDashboard = () => {
   };
 
   const setPresetScenario = (preset) => {
+    setActivePreset(preset);
     switch (preset) {
       case 'base':
         setCurrentScenario({
           2025: { eflLeague1Position: 3, faCupProgress: 'Round 4', eflCupProgress: '', relegatedFromChampionship: false },
           2026: { league: 'championship', position: 8, championsLeague: '', europaLeague: '', conferenceLeague: '', faCupProgress: '', eflCupProgress: '', parachutePayment: false },
-          2027: { league: 'premierLeague', position: 15, championsLeague: '', europaLeague: '', conferenceLeague: '', faCupProgress: '', eflCupProgress: '' }
+          2027: { league: 'premierLeague', position: 15, championsLeague: '', europaLeague: '', conferenceLeague: '', faCupProgress: '', eflCupProgress: '', parachutePayment: false }
         });
         break;
       case 'low':
         setCurrentScenario({
           2025: { eflLeague1Position: 20, faCupProgress: '', eflCupProgress: '', relegatedFromChampionship: false },
           2026: { league: 'eflLeague1', position: 16, championsLeague: '', europaLeague: '', conferenceLeague: '', faCupProgress: '', eflCupProgress: '', parachutePayment: false },
-          2027: { league: 'eflLeague1', position: 18, championsLeague: '', europaLeague: '', conferenceLeague: '', faCupProgress: '', eflCupProgress: '' }
+          2027: { league: 'eflLeague1', position: 18, championsLeague: '', europaLeague: '', conferenceLeague: '', faCupProgress: '', eflCupProgress: '', parachutePayment: false }
         });
         break;
       case 'high':
         setCurrentScenario({
           2025: { eflLeague1Position: 1, faCupProgress: 'Winner', eflCupProgress: '', relegatedFromChampionship: false },
           2026: { league: 'championship', position: 2, championsLeague: '', europaLeague: '', conferenceLeague: 'Conference League Semi-Final', faCupProgress: '', eflCupProgress: '', parachutePayment: false },
-          2027: { league: 'premierLeague', position: 6, championsLeague: '', europaLeague: 'Europa League Group', conferenceLeague: '', faCupProgress: '', eflCupProgress: '' }
+          2027: { league: 'premierLeague', position: 6, championsLeague: '', europaLeague: 'Europa League Group', conferenceLeague: '', faCupProgress: '', eflCupProgress: '', parachutePayment: false }
         });
         break;
     }
@@ -642,62 +642,95 @@ const ClubDNAFinancialDashboard = () => {
         <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-6">
           <button
             onClick={() => setPresetScenario('base')}
-            className={`p-6 rounded-xl border-2 transition-all duration-300 hover:bg-white/10 hover:border-white/30 text-left ${
-              'border-white/20 bg-white/5'
+            className={`p-6 rounded-xl border-2 transition-all duration-300 text-left ${
+              activePreset === 'base'
+                ? 'border-blue-400 bg-blue-500/20 shadow-xl scale-105'
+                : 'border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/30'
             }`}
           >
-            <div className="flex items-center mb-3">
-              <Crosshair className="w-6 h-6 mr-3 text-blue-400" />
-              <h4 className="font-semibold text-lg">Base Scenario</h4>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold">Base Scenario</h3>
+              <div className="text-2xl">
+                <Crosshair className="w-8 h-8 text-blue-400" />
+              </div>
             </div>
-            <p className="text-blue-200 text-sm mb-2">Steady progression through the leagues</p>
-            <div className="text-xs text-gray-300">
-              League 1 (3rd) → Championship (8th) → Premier League (15th)
+            <p className="text-blue-200 mb-4">League 1 → Championship → Premier League</p>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span>3-Year Revenue:</span>
+                <span className="font-semibold">£{(financialData[2025].total + financialData[2026].total + financialData[2027].total).toFixed(0)}k</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Average/Year:</span>
+                <span className="font-semibold">£{((financialData[2025].total + financialData[2026].total + financialData[2027].total) / 3).toFixed(0)}k</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Final League:</span>
+                <span className="font-semibold">Premier League</span>
+              </div>
             </div>
-            <div className="mt-3 text-2xl font-bold text-blue-400">
-              £{((15000 + 26000 + 140000) / 1000).toFixed(0)}k
-            </div>
-            <div className="text-xs text-blue-200">3-Year Revenue Estimate</div>
           </button>
           
           <button
             onClick={() => setPresetScenario('low')}
-            className={`p-6 rounded-xl border-2 transition-all duration-300 hover:bg-white/10 hover:border-white/30 text-left ${
-              'border-white/20 bg-white/5'
+            className={`p-6 rounded-xl border-2 transition-all duration-300 text-left ${
+              activePreset === 'low'
+                ? 'border-blue-400 bg-blue-500/20 shadow-xl scale-105'
+                : 'border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/30'
             }`}
           >
-            <div className="flex items-center mb-3">
-              <Shield className="w-6 h-6 mr-3 text-yellow-400" />
-              <h4 className="font-semibold text-lg">Conservative Scenario</h4>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold">Conservative Scenario</h3>
+              <div className="text-2xl">
+                <Shield className="w-8 h-8 text-orange-400" />
+              </div>
             </div>
-            <p className="text-yellow-200 text-sm mb-2">Slow progression, staying in lower leagues</p>
-            <div className="text-xs text-gray-300">
-              League 1 (20th) → League 1 (16th) → League 1 (18th)
+            <p className="text-blue-200 mb-4">League 1 → League 1 → League 1</p>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span>3-Year Revenue:</span>
+                <span className="font-semibold">£{(financialData[2025].total + financialData[2026].total + financialData[2027].total).toFixed(0)}k</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Average/Year:</span>
+                <span className="font-semibold">£{((financialData[2025].total + financialData[2026].total + financialData[2027].total) / 3).toFixed(0)}k</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Final League:</span>
+                <span className="font-semibold">League 1</span>
+              </div>
             </div>
-            <div className="mt-3 text-2xl font-bold text-yellow-400">
-              £{((8000 + 8000 + 8000) / 1000).toFixed(0)}k
-            </div>
-            <div className="text-xs text-yellow-200">3-Year Revenue Estimate</div>
           </button>
 
           <button
             onClick={() => setPresetScenario('high')}
-            className={`p-6 rounded-xl border-2 transition-all duration-300 hover:bg-white/10 hover:border-white/30 text-left ${
-              'border-white/20 bg-white/5'
+            className={`p-6 rounded-xl border-2 transition-all duration-300 text-left ${
+              activePreset === 'high'
+                ? 'border-blue-400 bg-blue-500/20 shadow-xl scale-105'
+                : 'border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/30'
             }`}
           >
-            <div className="flex items-center mb-3">
-              <Trophy className="w-6 h-6 mr-3 text-green-400" />
-              <h4 className="font-semibold text-lg">Optimistic Scenario</h4>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold">Optimistic Scenario</h3>
+              <div className="text-2xl">
+                <Trophy className="w-8 h-8 text-yellow-400" />
+              </div>
             </div>
-            <p className="text-green-200 text-sm mb-2">Rapid ascent with European football</p>
-            <div className="text-xs text-gray-300">
-              League 1 (1st) + FA Cup → Championship (2nd) → Premier League (6th) + Europa
+            <p className="text-blue-200 mb-4">League 1 → Championship → PL + Europa</p>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span>3-Year Revenue:</span>
+                <span className="font-semibold">£{(financialData[2025].total + financialData[2026].total + financialData[2027].total).toFixed(0)}k</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Average/Year:</span>
+                <span className="font-semibold">£{((financialData[2025].total + financialData[2026].total + financialData[2027].total) / 3).toFixed(0)}k</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Final League:</span>
+                <span className="font-semibold">Premier League</span>
+              </div>
             </div>
-            <div className="mt-3 text-2xl font-bold text-green-400">
-              £{((12000 + 35000 + 175000) / 1000).toFixed(0)}k
-            </div>
-            <div className="text-xs text-green-200">3-Year Revenue Estimate</div>
           </button>
         </div>
 
