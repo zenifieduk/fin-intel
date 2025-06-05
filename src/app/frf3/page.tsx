@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, AreaChart, Area } from 'recharts';
-import { TrendingUp, AlertTriangle, CheckCircle, Target, Trophy, DollarSign, Users, Calendar, Settings, Play, Pause } from 'lucide-react';
+import { TrendingUp, AlertTriangle, CheckCircle, Target, Trophy, DollarSign, Users, Calendar, Settings, Play, Pause, Crown, Shield, Crosshair } from 'lucide-react';
 
 interface YearData {
   premierLeague: string | number;
@@ -311,24 +311,30 @@ const ClubDNAFinancialDashboard = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Quick Preset Buttons */}
-        <div className="mb-6 flex flex-wrap gap-3">
+        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-3">
           <button
             onClick={() => setPresetScenario('base')}
-            className="px-6 py-3 bg-blue-500/20 border border-blue-400/30 rounded-lg text-blue-200 hover:bg-blue-500/30 transition-all"
+            className="px-4 py-3 bg-blue-500/20 border border-blue-400/30 rounded-lg text-blue-200 hover:bg-blue-500/30 transition-all flex items-center justify-center text-sm"
           >
-            🎯 Base Scenario (Championship → PL 4th → PL 1st)
+            <Crosshair className="w-4 h-4 mr-2" />
+            <span className="hidden sm:inline">Base Scenario (Championship → PL 4th → PL 1st)</span>
+            <span className="sm:hidden">Base Scenario</span>
           </button>
           <button
             onClick={() => setPresetScenario('low')}
-            className="px-6 py-3 bg-yellow-500/20 border border-yellow-400/30 rounded-lg text-yellow-200 hover:bg-yellow-500/30 transition-all"
+            className="px-4 py-3 bg-yellow-500/20 border border-yellow-400/30 rounded-lg text-yellow-200 hover:bg-yellow-500/30 transition-all flex items-center justify-center text-sm"
           >
-            ⚠️ Low Scenario (Championship → PL Struggle)
+            <Shield className="w-4 h-4 mr-2" />
+            <span className="hidden sm:inline">Low Scenario (Championship → PL Struggle)</span>
+            <span className="sm:hidden">Low Scenario</span>
           </button>
           <button
             onClick={() => setPresetScenario('high')}
-            className="px-6 py-3 bg-green-500/20 border border-green-400/30 rounded-lg text-green-200 hover:bg-green-500/30 transition-all"
+            className="px-4 py-3 bg-green-500/20 border border-green-400/30 rounded-lg text-green-200 hover:bg-green-500/30 transition-all flex items-center justify-center text-sm"
           >
-            🏆 High Scenario (Championship → PL Champions)
+            <Crown className="w-4 h-4 mr-2" />
+            <span className="hidden sm:inline">High Scenario (Championship → PL Champions)</span>
+            <span className="sm:hidden">High Scenario</span>
           </button>
         </div>
 
@@ -707,7 +713,7 @@ const ClubDNAFinancialDashboard = () => {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center p-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg border border-blue-400/30">
-              <div className="text-2xl mb-2">🎯</div>
+              <div className="text-2xl mb-2 flex justify-center"><Crosshair className="w-8 h-8 text-blue-400" /></div>
               <h4 className="font-semibold text-blue-200 mb-2">Base Scenario</h4>
               <div className="text-3xl font-bold mb-1">£275k</div>
               <div className="text-sm text-blue-200">3-Year Revenue</div>
@@ -715,7 +721,7 @@ const ClubDNAFinancialDashboard = () => {
             </div>
             
             <div className="text-center p-4 bg-gradient-to-r from-yellow-500/20 to-red-500/20 rounded-lg border border-yellow-400/30">
-              <div className="text-2xl mb-2">⚠️</div>
+              <div className="text-2xl mb-2 flex justify-center"><Shield className="w-8 h-8 text-orange-400" /></div>
               <h4 className="font-semibold text-yellow-200 mb-2">Low Scenario</h4>
               <div className="text-3xl font-bold mb-1">£185k</div>
               <div className="text-sm text-yellow-200">3-Year Revenue</div>
@@ -723,7 +729,7 @@ const ClubDNAFinancialDashboard = () => {
             </div>
             
             <div className="text-center p-4 bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-lg border border-green-400/30">
-              <div className="text-2xl mb-2">🏆</div>
+              <div className="text-2xl mb-2 flex justify-center"><Crown className="w-8 h-8 text-yellow-400" /></div>
               <h4 className="font-semibold text-green-200 mb-2">High Scenario</h4>
               <div className="text-3xl font-bold mb-1">£425k</div>
               <div className="text-sm text-green-200">3-Year Revenue</div>

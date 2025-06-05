@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { TrendingUp, AlertTriangle, CheckCircle, Target, DollarSign, Users, Settings, Trophy, Play, Pause } from 'lucide-react';
+import { TrendingUp, AlertTriangle, CheckCircle, Target, DollarSign, Users, Settings, Trophy, Play, Pause, Crown, Shield, Crosshair } from 'lucide-react';
 
 const ClubDNAFinancialDashboard = () => {
   const [isLiveMode, setIsLiveMode] = useState(false);
@@ -448,27 +448,30 @@ const ClubDNAFinancialDashboard = () => {
                   premierLeague: 4, championsLeague: 'League Stage', europaLeague: 'Quarter-Final',
                   conferenceLeague: '', superCup: '', faCup: '', eflCup: '', eflChampionship: 3, championshipParachute: 'No'
                 })}
-                className="px-4 py-2 bg-blue-500/20 border border-blue-400/30 rounded-lg text-blue-200 hover:bg-blue-500/30 transition-all"
+                className="px-4 py-2 bg-blue-500/20 border border-blue-400/30 rounded-lg text-blue-200 hover:bg-blue-500/30 transition-all flex items-center"
               >
-                🎯 Base Scenario
+                <Crosshair className="w-4 h-4 mr-2" />
+                Base Scenario
               </button>
               <button
                 onClick={() => setCurrentScenario({
                   premierLeague: 15, championsLeague: '', europaLeague: 'League Stage',
                   conferenceLeague: '', superCup: '', faCup: '', eflCup: '', eflChampionship: 3, championshipParachute: 'No'
                 })}
-                className="px-4 py-2 bg-yellow-500/20 border border-yellow-400/30 rounded-lg text-yellow-200 hover:bg-yellow-500/30 transition-all"
+                className="px-4 py-2 bg-yellow-500/20 border border-yellow-400/30 rounded-lg text-yellow-200 hover:bg-yellow-500/30 transition-all flex items-center"
               >
-                ⚠️ Relegation Battle
+                <Shield className="w-4 h-4 mr-2" />
+                Relegation Battle
               </button>
               <button
                 onClick={() => setCurrentScenario({
                   premierLeague: 1, championsLeague: 'Winner', europaLeague: '',
                   conferenceLeague: '', superCup: 'Winner', faCup: 'Winner', eflCup: 'Winner', eflChampionship: 3, championshipParachute: 'No'
                 })}
-                className="px-4 py-2 bg-green-500/20 border border-green-400/30 rounded-lg text-green-200 hover:bg-green-500/30 transition-all"
+                className="px-4 py-2 bg-green-500/20 border border-green-400/30 rounded-lg text-green-200 hover:bg-green-500/30 transition-all flex items-center"
               >
-                🏆 Treble Winners
+                <Crown className="w-4 h-4 mr-2" />
+                Treble Winners
               </button>
             </div>
           </div>
