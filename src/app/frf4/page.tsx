@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
-import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, Trophy, DollarSign, Users, Calendar, Settings, Play, Pause, Crosshair, Shield } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, Trophy, DollarSign, Users, Calendar, Settings, Play, Pause, Crosshair, Shield, Menu, X } from 'lucide-react';
 
 type ScenarioYear = 2025 | 2026 | 2027;
 
@@ -43,6 +43,7 @@ interface ScenarioData {
 
 const ClubDNAFinancialDashboard = () => {
   const [isLiveMode, setIsLiveMode] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentScenario, setCurrentScenario] = useState<ScenarioData>({
     2025: {
       eflLeague1Position: 3, // Starting in EFL League 1
@@ -519,22 +520,102 @@ const ClubDNAFinancialDashboard = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setIsLiveMode(!isLiveMode)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
-                  isLiveMode ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-600 hover:bg-gray-700'
-                }`}
-              >
-                {isLiveMode ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                <span>{isLiveMode ? 'Live Mode' : 'Static Mode'}</span>
-              </button>
-              <div className="text-sm text-blue-200">
+              <div className="hidden md:block text-sm text-blue-200">
                 Season: 2024/25 • Week 23 • {new Date().toLocaleDateString()}
               </div>
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="flex items-center justify-center w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200"
+                aria-label="Toggle menu"
+              >
+                {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="bg-black/30 backdrop-blur-sm border-b border-white/10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="space-y-4">
+              <div className="block md:hidden text-sm text-blue-200">
+                Season: 2024/25 • Week 23 • {new Date().toLocaleDateString()}
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={() => setIsLiveMode(!isLiveMode)}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
+                    isLiveMode ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-600 hover:bg-gray-700'
+                  }`}
+                >
+                  {isLiveMode ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                  <span>{isLiveMode ? 'Live Mode' : 'Static Mode'}</span>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="text-sm">
+                  <div className="text-blue-200 font-medium">Quick Actions</div>
+                  <div className="mt-2 space-y-1">
+                    <button 
+                      onClick={() => {
+                        setPresetScenario('base');
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="block text-white/80 hover:text-white transition-colors"
+                    >
+                      Base Scenario
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setPresetScenario('low');
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="block text-white/80 hover:text-white transition-colors"
+                    >
+                      Conservative Scenario
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setPresetScenario('high');
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="block text-white/80 hover:text-white transition-colors"
+                    >
+                      Optimistic Scenario
+                    </button>
+                  </div>
+                </div>
+
+                <div className="text-sm">
+                  <div className="text-blue-200 font-medium">Current Revenue</div>
+                  <div className="mt-2 text-white">
+                    £{totalRevenue.toLocaleString()}k over 3 years
+                  </div>
+                </div>
+
+                <div className="text-sm">
+                  <div className="text-blue-200 font-medium">Navigation</div>
+                  <div className="mt-2 space-y-1">
+                    <a href="/frf" className="block text-white/80 hover:text-white transition-colors">
+                      FRF Analysis
+                    </a>
+                    <a href="/frf3" className="block text-white/80 hover:text-white transition-colors">
+                      FRF3 Dashboard
+                    </a>
+                    <a href="/frf4" className="block text-white/80 hover:text-white transition-colors">
+                      FRF4 Progression
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Quick Preset Buttons */}
