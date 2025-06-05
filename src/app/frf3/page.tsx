@@ -1,8 +1,17 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
-import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, Trophy, DollarSign, Users, Calendar, Settings, Play, Pause } from 'lucide-react';
+import { XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, AreaChart, Area } from 'recharts';
+import { TrendingUp, AlertTriangle, CheckCircle, Target, Trophy, DollarSign, Users, Calendar, Settings, Play, Pause } from 'lucide-react';
+
+interface YearData {
+  premierLeague: string | number;
+  championsLeague: string;
+  europaLeague: string;
+  conferenceLeague: string;
+  eflChampionship: string | number;
+  championshipParachute: string;
+}
 
 const ClubDNAFinancialDashboard = () => {
   const [isLiveMode, setIsLiveMode] = useState(false);
@@ -49,13 +58,13 @@ const ClubDNAFinancialDashboard = () => {
   };
 
   // Calculate financial impact for each year
-  const calculateYearlyFinancials = (yearData: any, year: number) => {    let broadcasting = 0;
+  const calculateYearlyFinancials = (yearData: YearData) => {    let broadcasting = 0;
     let commercial = 10000;
     let matchday = 5000;
     
     // EFL Championship (if playing there)
     if (yearData.eflChampionship && yearData.eflChampionship !== '') {
-      const position = parseInt(yearData.eflChampionship);
+      const position = parseInt(String(yearData.eflChampionship));
       broadcasting = 15000 - (position * 200); // Championship base revenue
       commercial = 8000;
       matchday = 4000;
@@ -80,7 +89,7 @@ const ClubDNAFinancialDashboard = () => {
     
     // Premier League (if playing there)
     if (yearData.premierLeague && yearData.premierLeague !== '') {
-      const position = parseInt(yearData.premierLeague);
+      const position = parseInt(String(yearData.premierLeague));
       
       // Premier League base payment + merit payment
       broadcasting = 100000 + (21 - position) * 2000;
@@ -142,9 +151,9 @@ const ClubDNAFinancialDashboard = () => {
 
   // Calculate all years' financials
   const financialData = {
-    2025: calculateYearlyFinancials(currentScenario[2025], 2025),
-    2026: calculateYearlyFinancials(currentScenario[2026], 2026),
-    2027: calculateYearlyFinancials(currentScenario[2027], 2027)
+    2025: calculateYearlyFinancials(currentScenario[2025]),
+    2026: calculateYearlyFinancials(currentScenario[2026]),
+    2027: calculateYearlyFinancials(currentScenario[2027])
   };
 
   // Calculate total 3-year revenue
@@ -499,7 +508,7 @@ const ClubDNAFinancialDashboard = () => {
                 <XAxis dataKey="year" stroke="#94a3b8" />
                 <YAxis stroke="#94a3b8" tickFormatter={(value) => `£${(value/1000).toFixed(0)}k`} />
                 <Tooltip 
-                  formatter={(value: any) => [`£${(value/1000).toFixed(0)}k`, '']}
+                  formatter={(value: number) => [`£${(value/1000).toFixed(0)}k`, '']}
                   labelStyle={{ color: '#1e293b' }}
                   contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569' }}
                 />
@@ -531,7 +540,7 @@ const ClubDNAFinancialDashboard = () => {
                 <XAxis dataKey="year" stroke="#94a3b8" />
                 <YAxis stroke="#94a3b8" tickFormatter={(value) => `£${(value/1000).toFixed(0)}k`} />
                 <Tooltip 
-                  formatter={(value: any) => [`£${(value/1000).toFixed(0)}k`, '']}
+                  formatter={(value: number) => [`£${(value/1000).toFixed(0)}k`, '']}
                   labelStyle={{ color: '#1e293b' }}
                   contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569' }}
                 />

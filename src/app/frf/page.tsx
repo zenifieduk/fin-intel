@@ -1,8 +1,8 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, RadialBarChart, RadialBar } from 'recharts';
-import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, Trophy, DollarSign, Users, Calendar, Zap, Settings, Play, Pause, Crown, Shield, Crosshair } from 'lucide-react';
+import { XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
+import { TrendingUp, AlertTriangle, CheckCircle, Target, Trophy, DollarSign, Users, Settings, Play, Pause, Crown, Shield, Crosshair } from 'lucide-react';
 
 type ScenarioKey = 'base' | 'low' | 'high';
 
@@ -12,37 +12,12 @@ interface ComplianceData {
   threshold: number;
 }
 
-interface ScenarioData {
-  name: string;
-  description: string;
-  premierLeaguePosition: number;
-  championsLeague: string;
-  europaLeague: string;
-  revenue: {
-    broadcasting: number;
-    commercial: number;
-    matchday: number;
-    total: number;
-  };
-  compliance: {
-    psr: ComplianceData;
-    footballEarnings: ComplianceData;
-    squadCostRatio: ComplianceData;
-  };
-  players: {
-    jamesWilliams: { goals: number; bonus: number };
-    stuartGreen: { cleanSheets: number; bonus: number };
-    chrisTuson: { appearances: number; bonus: number };
-    andyClarke: { appearances: number; bonus: number };
-    philClarke: { appearances: number; bonus: number };
-  };
-}
+
 
 const ClubDNAFinancialDashboard = () => {
   const [activeScenario, setActiveScenario] = useState<ScenarioKey>('base');
   const [isLiveMode, setIsLiveMode] = useState(false);
-  const [selectedMetric, setSelectedMetric] = useState('revenue');
-  const [animationSpeed, setAnimationSpeed] = useState(1000);
+
   const [currentDate, setCurrentDate] = useState<string>('');
 
   // Extracted financial model data from the Excel file
@@ -191,11 +166,7 @@ const ClubDNAFinancialDashboard = () => {
     { name: 'Phil Clarke', position: 'Midfielder', metric: `${currentScenario.players.philClarke.appearances} apps`, bonus: currentScenario.players.philClarke.bonus }
   ];
 
-  const complianceData = [
-    { metric: 'PSR', value: (currentScenario.compliance.psr.value / currentScenario.compliance.psr.threshold * 100), fill: currentScenario.compliance.psr.status === 'compliant' ? '#10b981' : '#f59e0b' },
-    { metric: 'Football Earnings', value: (currentScenario.compliance.footballEarnings.value / currentScenario.compliance.footballEarnings.threshold * 100), fill: currentScenario.compliance.footballEarnings.status === 'compliant' ? '#10b981' : '#f59e0b' },
-    { metric: 'Squad Cost Ratio', value: (currentScenario.compliance.squadCostRatio.value / currentScenario.compliance.squadCostRatio.threshold * 100), fill: '#10b981' }
-  ];
+
 
   // Initialize date on client side to avoid hydration mismatch
   useEffect(() => {
@@ -207,10 +178,10 @@ const ClubDNAFinancialDashboard = () => {
       const interval = setInterval(() => {
         // Simulate live updates with small variations
         // In a real implementation, this would connect to live data feeds
-      }, animationSpeed);
+      }, 1000);
       return () => clearInterval(interval);
     }
-  }, [isLiveMode, animationSpeed]);
+  }, [isLiveMode]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white">
