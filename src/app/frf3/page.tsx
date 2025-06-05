@@ -13,9 +13,33 @@ interface YearData {
   championshipParachute: string;
 }
 
+type ScenarioKey = 'base' | 'low' | 'high';
+
+const scenarioData = {
+  base: {
+    name: "Base Scenario",
+    description: "Championship → PL 4th → PL 1st",
+    totalRevenue: 275000,
+    psrStatus: "compliant"
+  },
+  low: {
+    name: "Conservative Scenario", 
+    description: "Championship → PL Struggle",
+    totalRevenue: 185000,
+    psrStatus: "monitor"
+  },
+  high: {
+    name: "Championship Victory",
+    description: "Championship → PL Champions",
+    totalRevenue: 425000,
+    psrStatus: "monitor"
+  }
+};
+
 const ClubDNAFinancialDashboard = () => {
   const [isLiveMode, setIsLiveMode] = useState(false);
   const [currentDate, setCurrentDate] = useState<string>('');
+  const [activeScenario, setActiveScenario] = useState<ScenarioKey>('base');
   const [currentScenario, setCurrentScenario] = useState({
     2025: {
       premierLeague: '',
@@ -238,6 +262,19 @@ const ClubDNAFinancialDashboard = () => {
     }
   };
 
+  const getStatusColorForScenario = (status: string) => {
+    switch (status) {
+      case 'compliant':
+        return 'bg-green-500/20 text-green-200';
+      case 'monitor':
+        return 'bg-yellow-500/20 text-yellow-200';
+      case 'breach':
+        return 'bg-red-500/20 text-red-200';
+      default:
+        return 'bg-gray-500/20 text-gray-200';
+    }
+  };
+
   const updateScenario = (year: number, field: string, value: string | number) => {
     setCurrentScenario(prev => ({
       ...prev,
@@ -249,6 +286,7 @@ const ClubDNAFinancialDashboard = () => {
   };
 
   const setPresetScenario = (preset: string) => {
+    setActiveScenario(preset as ScenarioKey);
     switch (preset) {
       case 'base':
         setCurrentScenario({
@@ -310,32 +348,117 @@ const ClubDNAFinancialDashboard = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Quick Preset Buttons */}
-        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-3">
-          <button
-            onClick={() => setPresetScenario('base')}
-            className="px-4 py-3 bg-blue-500/20 border border-blue-400/30 rounded-lg text-blue-200 hover:bg-blue-500/30 transition-all flex items-center justify-center text-sm"
-          >
-            <Crosshair className="w-4 h-4 mr-2" />
-            <span className="hidden sm:inline">Base Scenario (Championship → PL 4th → PL 1st)</span>
-            <span className="sm:hidden">Base Scenario</span>
-          </button>
-          <button
-            onClick={() => setPresetScenario('low')}
-            className="px-4 py-3 bg-yellow-500/20 border border-yellow-400/30 rounded-lg text-yellow-200 hover:bg-yellow-500/30 transition-all flex items-center justify-center text-sm"
-          >
-            <Shield className="w-4 h-4 mr-2" />
-            <span className="hidden sm:inline">Low Scenario (Championship → PL Struggle)</span>
-            <span className="sm:hidden">Low Scenario</span>
-          </button>
-          <button
-            onClick={() => setPresetScenario('high')}
-            className="px-4 py-3 bg-green-500/20 border border-green-400/30 rounded-lg text-green-200 hover:bg-green-500/30 transition-all flex items-center justify-center text-sm"
-          >
-            <Crown className="w-4 h-4 mr-2" />
-            <span className="hidden sm:inline">High Scenario (Championship → PL Champions)</span>
-            <span className="sm:hidden">High Scenario</span>
-          </button>
+        {/* Scenario Selector */}
+        <div className="mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <button
+              onClick={() => {
+                setActiveScenario('base');
+                setPresetScenario('base');
+              }}
+              className={`p-6 rounded-xl border-2 transition-all duration-300 ${
+                activeScenario === 'base'
+                  ? 'border-blue-400 bg-blue-500/20 shadow-xl scale-105'
+                  : 'border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/30'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold">Base Scenario</h3>
+                <div className="text-2xl">
+                  <Crosshair className="w-8 h-8 text-blue-400" />
+                </div>
+              </div>
+              <p className="text-blue-200 mb-4">Championship → PL 4th → PL 1st</p>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>3-Year Revenue:</span>
+                  <span className="font-semibold">£{(scenarioData.base.totalRevenue / 1000).toFixed(0)}k</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>PSR Status:</span>
+                  <span className={`px-2 py-1 rounded text-xs ${getStatusColorForScenario(scenarioData.base.psrStatus)}`}>
+                    {scenarioData.base.psrStatus}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Average/Year:</span>
+                  <span className="font-semibold">£{(scenarioData.base.totalRevenue / 3 / 1000).toFixed(0)}k</span>
+                </div>
+              </div>
+            </button>
+            
+            <button
+              onClick={() => {
+                setActiveScenario('low');
+                setPresetScenario('low');
+              }}
+              className={`p-6 rounded-xl border-2 transition-all duration-300 ${
+                activeScenario === 'low'
+                  ? 'border-blue-400 bg-blue-500/20 shadow-xl scale-105'
+                  : 'border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/30'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold">Conservative Scenario</h3>
+                <div className="text-2xl">
+                  <Shield className="w-8 h-8 text-orange-400" />
+                </div>
+              </div>
+              <p className="text-blue-200 mb-4">Championship → PL Struggle</p>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>3-Year Revenue:</span>
+                  <span className="font-semibold">£{(scenarioData.low.totalRevenue / 1000).toFixed(0)}k</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>PSR Status:</span>
+                  <span className={`px-2 py-1 rounded text-xs ${getStatusColorForScenario(scenarioData.low.psrStatus)}`}>
+                    {scenarioData.low.psrStatus}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Average/Year:</span>
+                  <span className="font-semibold">£{(scenarioData.low.totalRevenue / 3 / 1000).toFixed(0)}k</span>
+                </div>
+              </div>
+            </button>
+            
+            <button
+              onClick={() => {
+                setActiveScenario('high');
+                setPresetScenario('high');
+              }}
+              className={`p-6 rounded-xl border-2 transition-all duration-300 ${
+                activeScenario === 'high'
+                  ? 'border-blue-400 bg-blue-500/20 shadow-xl scale-105'
+                  : 'border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/30'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold">Championship Victory</h3>
+                <div className="text-2xl">
+                  <Crown className="w-8 h-8 text-yellow-400" />
+                </div>
+              </div>
+              <p className="text-blue-200 mb-4">Championship → PL Champions</p>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>3-Year Revenue:</span>
+                  <span className="font-semibold">£{(scenarioData.high.totalRevenue / 1000).toFixed(0)}k</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>PSR Status:</span>
+                  <span className={`px-2 py-1 rounded text-xs ${getStatusColorForScenario(scenarioData.high.psrStatus)}`}>
+                    {scenarioData.high.psrStatus}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Average/Year:</span>
+                  <span className="font-semibold">£{(scenarioData.high.totalRevenue / 3 / 1000).toFixed(0)}k</span>
+                </div>
+              </div>
+            </button>
+          </div>
         </div>
 
         {/* Scenario Builder */}
@@ -705,35 +828,56 @@ const ClubDNAFinancialDashboard = () => {
           </div>
         </div>
 
-        {/* Scenario Comparison */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 mb-8">
+        {/* Quick Scenario Comparison */}
+        <div className="mb-8">
           <h3 className="text-xl font-semibold mb-6 flex items-center">
             <Calendar className="w-5 h-5 mr-2 text-orange-400" />
             Quick Scenario Comparison
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center p-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg border border-blue-400/30">
-              <div className="text-2xl mb-2 flex justify-center"><Crosshair className="w-8 h-8 text-blue-400" /></div>
-              <h4 className="font-semibold text-blue-200 mb-2">Base Scenario</h4>
-              <div className="text-3xl font-bold mb-1">£275k</div>
-              <div className="text-sm text-blue-200">3-Year Revenue</div>
-              <div className="text-xs text-blue-300 mt-2">Championship → PL 4th → PL 1st</div>
+            {/* Base Scenario */}
+            <div className="bg-gradient-to-br from-blue-500/20 via-blue-600/20 to-purple-600/20 rounded-xl p-6 border border-white/20">
+              <div className="text-center">
+                <div className="mb-4">
+                  <Crosshair className="w-12 h-12 text-blue-400 mx-auto" />
+                </div>
+                <h4 className="text-xl font-bold mb-2">Base Scenario</h4>
+                <div className="text-3xl font-bold text-white mb-2">£275k</div>
+                <div className="text-blue-200 text-sm mb-3">3-Year Revenue</div>
+                <div className="text-sm text-blue-300">
+                  Championship → PL 4th → PL 1st
+                </div>
+              </div>
             </div>
-            
-            <div className="text-center p-4 bg-gradient-to-r from-yellow-500/20 to-red-500/20 rounded-lg border border-yellow-400/30">
-              <div className="text-2xl mb-2 flex justify-center"><Shield className="w-8 h-8 text-orange-400" /></div>
-              <h4 className="font-semibold text-yellow-200 mb-2">Low Scenario</h4>
-              <div className="text-3xl font-bold mb-1">£185k</div>
-              <div className="text-sm text-yellow-200">3-Year Revenue</div>
-              <div className="text-xs text-yellow-300 mt-2">Championship → PL Struggle</div>
+
+            {/* Low Scenario */}
+            <div className="bg-gradient-to-br from-orange-500/20 via-red-500/20 to-pink-600/20 rounded-xl p-6 border border-white/20">
+              <div className="text-center">
+                <div className="mb-4">
+                  <Shield className="w-12 h-12 text-orange-400 mx-auto" />
+                </div>
+                <h4 className="text-xl font-bold mb-2">Low Scenario</h4>
+                <div className="text-3xl font-bold text-white mb-2">£185k</div>
+                <div className="text-orange-200 text-sm mb-3">3-Year Revenue</div>
+                <div className="text-sm text-orange-300">
+                  Championship → PL Struggle
+                </div>
+              </div>
             </div>
-            
-            <div className="text-center p-4 bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-lg border border-green-400/30">
-              <div className="text-2xl mb-2 flex justify-center"><Crown className="w-8 h-8 text-yellow-400" /></div>
-              <h4 className="font-semibold text-green-200 mb-2">High Scenario</h4>
-              <div className="text-3xl font-bold mb-1">£425k</div>
-              <div className="text-sm text-green-200">3-Year Revenue</div>
-              <div className="text-xs text-green-300 mt-2">Championship → PL Champions</div>
+
+            {/* High Scenario */}
+            <div className="bg-gradient-to-br from-green-500/20 via-emerald-600/20 to-teal-600/20 rounded-xl p-6 border border-white/20">
+              <div className="text-center">
+                <div className="mb-4">
+                  <Crown className="w-12 h-12 text-yellow-400 mx-auto" />
+                </div>
+                <h4 className="text-xl font-bold mb-2">High Scenario</h4>
+                <div className="text-3xl font-bold text-white mb-2">£425k</div>
+                <div className="text-green-200 text-sm mb-3">3-Year Revenue</div>
+                <div className="text-sm text-green-300">
+                  Championship → PL Champions
+                </div>
+              </div>
             </div>
           </div>
         </div>
