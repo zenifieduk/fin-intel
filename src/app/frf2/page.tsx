@@ -199,7 +199,7 @@ const ClubDNAFinancialDashboard = () => {
     }
     
     setPreviousFinancialData(financialData);
-  }, [financialData, previousFinancialData]);
+  }, [financialData]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
