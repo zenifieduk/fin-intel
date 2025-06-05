@@ -521,7 +521,7 @@ const ClubDNAFinancialDashboard = () => {
             </div>
             <div className="flex items-center space-x-4">
               <div className="hidden md:block text-sm text-blue-200">
-                Season: 2024/25 • Week 23 • {new Date().toLocaleDateString()}
+                Season: 2024/25 • Week 23 • {new Date().toLocaleDateString('en-GB')}
               </div>
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -535,13 +535,33 @@ const ClubDNAFinancialDashboard = () => {
         </div>
       </div>
 
+      {/* Navigation Menu */}
+      <div className="bg-black/10 backdrop-blur-sm border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <nav className="flex space-x-6">
+            <a href="/frf" className="text-white/70 hover:text-white transition-colors">
+              FRF Analysis
+            </a>
+            <a href="/frf2" className="text-white/70 hover:text-white transition-colors">
+              FRF2 Interactive
+            </a>
+            <a href="/frf3" className="text-white/70 hover:text-white transition-colors">
+              FRF3 3-Year Model
+            </a>
+            <a href="/frf4" className="text-blue-400 font-medium hover:text-blue-300 transition-colors">
+              FRF4 Progression
+            </a>
+          </nav>
+        </div>
+      </div>
+
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="bg-black/30 backdrop-blur-sm border-b border-white/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="space-y-4">
               <div className="block md:hidden text-sm text-blue-200">
-                Season: 2024/25 • Week 23 • {new Date().toLocaleDateString()}
+                Season: 2024/25 • Week 23 • {new Date().toLocaleDateString('en-GB')}
               </div>
               
               <div className="flex items-center space-x-4">
