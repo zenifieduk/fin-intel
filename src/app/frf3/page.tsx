@@ -363,6 +363,9 @@ const ClubDNAFinancialDashboard = () => {
             <a href="/frf4" className="text-white/70 hover:text-white transition-colors">
               FRF4 Progression
             </a>
+            <a href="/frf5" className="text-white/70 hover:text-white transition-colors">
+              FRF5 Ultimate
+            </a>
           </nav>
         </div>
       </div>
