@@ -1,10 +1,49 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Target, Trophy, DollarSign, Users, Calendar, Settings, Play, Pause, Crosshair, Shield } from 'lucide-react';
 
+type ScenarioYear = 2025 | 2026 | 2027;
+
+interface YearData2025 {
+  eflLeague1Position: number;
+  faCupProgress: string;
+  eflCupProgress: string;
+  relegatedFromChampionship: boolean;
+}
+
+interface YearData2026 {
+  league: string;
+  position: number;
+  championsLeague: string;
+  europaLeague: string;
+  conferenceLeague: string;
+  faCupProgress: string;
+  eflCupProgress: string;
+  parachutePayment: boolean;
+}
+
+interface YearData2027 {
+  league: string;
+  position: number;
+  championsLeague: string;
+  europaLeague: string;
+  conferenceLeague: string;
+  faCupProgress: string;
+  eflCupProgress: string;
+  parachutePayment: boolean;
+}
+
+interface ScenarioData {
+  2025: YearData2025;
+  2026: YearData2026;
+  2027: YearData2027;
+}
+
 const ClubDNAFinancialDashboard = () => {
   const [isLiveMode, setIsLiveMode] = useState(false);
-  const [currentScenario, setCurrentScenario] = useState({
+  const [currentScenario, setCurrentScenario] = useState<ScenarioData>({
     2025: {
       eflLeague1Position: 3, // Starting in EFL League 1
       faCupProgress: '',
@@ -28,7 +67,8 @@ const ClubDNAFinancialDashboard = () => {
       europaLeague: '',
       conferenceLeague: '',
       faCupProgress: '',
-      eflCupProgress: ''
+      eflCupProgress: '',
+      parachutePayment: false
     }
   });
 
