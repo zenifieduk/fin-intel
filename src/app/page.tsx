@@ -29,6 +29,9 @@ export default function Home() {
               <Button variant="ghost" asChild>
                 <Link href="/frf">FRF</Link>
               </Button>
+              <Button variant="ghost" asChild>
+                <Link href="/frf2">FRF2</Link>
+              </Button>
               <Button variant="outline" size="sm" asChild>
                 <Link href="https://github.com" target="_blank">
                   <Github className="h-4 w-4 mr-2" />
