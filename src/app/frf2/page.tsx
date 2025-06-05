@@ -11,6 +11,7 @@ const ClubDNAFinancialDashboard = () => {
     revenue: { broadcasting: number; commercial: number; matchday: number; total: number }
   } | null>(null);
   const [changePercentages, setChangePercentages] = useState<Record<string, number>>({});
+  const [lastUpdated, setLastUpdated] = useState<string>('--:--:--');
   
   // Interactive scenario state
   const [currentScenario, setCurrentScenario] = useState({
@@ -186,6 +187,7 @@ const ClubDNAFinancialDashboard = () => {
       
       setRecentlyUpdated(updated);
       setChangePercentages(changes);
+      setLastUpdated(new Date().toLocaleTimeString('en-GB', { hour12: false }));
       
       // Clear highlight after 3 seconds
       const timer = setTimeout(() => {
@@ -242,6 +244,11 @@ const ClubDNAFinancialDashboard = () => {
   ];
 
 
+
+  // Initialize timestamp on client side to avoid hydration mismatch
+  useEffect(() => {
+    setLastUpdated(new Date().toLocaleTimeString('en-GB', { hour12: false }));
+  }, []);
 
   // Live mode simulation (currently disabled - would connect to real data feeds)
   useEffect(() => {
@@ -638,7 +645,7 @@ const ClubDNAFinancialDashboard = () => {
             <div className="mt-4 p-3 bg-white/5 rounded-lg border border-white/10">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-300">Last Updated:</span>
-                <span className="text-blue-400 font-mono">{new Date().toLocaleTimeString('en-GB', { hour12: false })}</span>
+                <span className="text-blue-400 font-mono">{lastUpdated}</span>
               </div>
               {recentlyUpdated.length > 0 && (
                 <div className="mt-2 text-xs text-green-400">
