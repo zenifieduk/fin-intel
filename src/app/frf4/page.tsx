@@ -1,4 +1,4 @@
-// @ts-nocheck
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState } from 'react';
@@ -40,6 +40,29 @@ interface ScenarioData {
   2027: YearData2027;
 }
 
+interface LeagueOption {
+  value: string;
+  label: string;
+}
+
+interface AvailableOptions {
+  leagues: LeagueOption[];
+  positions: number[];
+  europeanComps: string[];
+  domesticCups: string[];
+}
+
+interface FinancialData {
+  broadcasting: number;
+  commercial: number;
+  matchday: number;
+  total: number;
+}
+
+type YearDataUnion = YearData2025 | YearData2026 | YearData2027;
+type StatusType = 'excellent' | 'compliant' | 'good' | 'monitor' | 'caution' | 'breach' | string;
+type PresetType = 'base' | 'low' | 'high';
+
 const ClubDNAFinancialDashboard = () => {
   const [isLiveMode, setIsLiveMode] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -73,7 +96,7 @@ const ClubDNAFinancialDashboard = () => {
     }
   });
 
-  const getAvailableOptions = (year: number) => {
+  const getAvailableOptions = (year: number): AvailableOptions => {
     const prevYear = year - 1;
     const prevScenario = currentScenario[prevYear as keyof ScenarioData];
     
@@ -89,7 +112,7 @@ const ClubDNAFinancialDashboard = () => {
     
     if (year === 2026) {
       // Determine league based on 2025 performance
-      let availableLeagues: any[] = [];
+      let availableLeagues: LeagueOption[] = [];
       let positions: number[] = [];
       let europeanComps: string[] = [];
       
@@ -132,7 +155,7 @@ const ClubDNAFinancialDashboard = () => {
     
     if (year === 2027) {
       // Determine league based on 2026 performance
-      let availableLeagues: any[] = [];
+      let availableLeagues: LeagueOption[] = [];
       let positions: number[] = [];
       let europeanComps: string[] = [];
       
@@ -190,13 +213,14 @@ const ClubDNAFinancialDashboard = () => {
   };
 
   // Calculate financial impact for each year with realistic league progression
-  const calculateYearlyFinancials = (yearData: any, year: number) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const calculateYearlyFinancials = (yearData: any, year: number): FinancialData => {
     let broadcasting = 0;
     let commercial = 8000;
     let matchday = 3000;
     
     // 2025: EFL League 1
-    if (year === 2025) {
+    if (year === 2025 && yearData && typeof yearData === 'object' && 'eflLeague1Position' in yearData) {
       const position = yearData.eflLeague1Position;
       broadcasting = 2500 - (position * 50); // League 1 base revenue
       commercial = 5000;
@@ -209,7 +233,7 @@ const ClubDNAFinancialDashboard = () => {
       }
       
       // FA Cup progress bonus
-      const faCupBonus = {
+      const faCupBonus: Record<string, number> = {
         'Round 3': 100, 'Round 4': 200, 'Round 5': 500,
         'Quarter-Final': 1000, 'Semi-Final': 2000,
         'Final': 3000, 'Winner': 5000
@@ -225,7 +249,7 @@ const ClubDNAFinancialDashboard = () => {
     }
     
     // Continue with 2026 and 2027 calculations...
-    if (year === 2026) {
+    if (year === 2026 && 'league' in yearData) {
       if (yearData.league === 'championship') {
         const position = yearData.position;
         broadcasting = 8000 - (position * 150); // Championship revenue
@@ -251,7 +275,7 @@ const ClubDNAFinancialDashboard = () => {
       }
       
       // European competition revenue (if won FA Cup in 2025)
-      const confLeagueBonus = {
+      const confLeagueBonus: Record<string, number> = {
         'Conference League Group': 1500,
         'Conference League Knockout': 2000,
         'Conference League Quarter-Final': 3000,
@@ -270,7 +294,7 @@ const ClubDNAFinancialDashboard = () => {
     }
     
     // 2027: Premier League, Championship, or League 1 based on 2026 performance
-    if (year === 2027) {
+    if (year === 2027 && 'league' in yearData) {
       if (yearData.league === 'premierLeague') {
         const position = yearData.position;
         broadcasting = 100000 + (21 - position) * 2000; // Premier League revenue
@@ -278,7 +302,7 @@ const ClubDNAFinancialDashboard = () => {
         matchday = 15000 + (position <= 4 ? 10000 : 0); // Top 4 attendance bonus
         
         // Champions League revenue
-        const clBonus = {
+        const clBonus: Record<string, number> = {
           'Champions League Group': 15000, 'Champions League R16': 25000,
           'Champions League Quarter-Final': 35000, 'Champions League Semi-Final': 50000,
           'Champions League Final': 65000, 'Champions League Winner': 85000
@@ -286,7 +310,7 @@ const ClubDNAFinancialDashboard = () => {
         broadcasting += clBonus[yearData.championsLeague] || 0;
         
         // Europa League revenue
-        const elBonus = {
+        const elBonus: Record<string, number> = {
           'Europa League Group': 8000, 'Europa League R16': 12000,
           'Europa League Quarter-Final': 18000, 'Europa League Semi-Final': 25000,
           'Europa League Final': 35000, 'Europa League Winner': 45000
@@ -294,7 +318,7 @@ const ClubDNAFinancialDashboard = () => {
         broadcasting += elBonus[yearData.europaLeague] || 0;
         
         // Conference League revenue
-        const confBonus = {
+        const confBonus: Record<string, number> = {
           'Conference League Group': 3000, 'Conference League R16': 5000,
           'Conference League Quarter-Final': 8000, 'Conference League Semi-Final': 12000,
           'Conference League Final': 18000, 'Conference League Winner': 25000
@@ -406,7 +430,7 @@ const ClubDNAFinancialDashboard = () => {
     }
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = (status: StatusType) => {
     switch (status) {
       case 'excellent':
       case 'compliant':
@@ -422,12 +446,12 @@ const ClubDNAFinancialDashboard = () => {
     }
   };
 
-  const updateScenario = (year, field, value) => {
+  const updateScenario = (year: number, field: string, value: string | number) => {
     setCurrentScenario(prev => {
       const newScenario = {
         ...prev,
         [year]: {
-          ...prev[year],
+          ...prev[year as keyof ScenarioData],
           [field]: value
         }
       };
@@ -476,7 +500,7 @@ const ClubDNAFinancialDashboard = () => {
     });
   };
 
-  const setPresetScenario = (preset) => {
+  const setPresetScenario = (preset: PresetType) => {
     setActivePreset(preset);
     switch (preset) {
       case 'base':
