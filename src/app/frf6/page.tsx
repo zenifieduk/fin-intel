@@ -424,6 +424,16 @@ const EFL_LIQUIDITY_ANALYZER = () => {
       )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Page Title Section */}
+        <div className="mb-8 text-center">
+          <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+            EFL Championship Position Financial Intelligence
+          </h2>
+          <p className="text-xl text-blue-200 mb-6">
+            Real-time position impact analysis revealing the brutal financial reality of Championship football
+          </p>
+        </div>
+
         {/* Controls */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">

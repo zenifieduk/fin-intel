@@ -496,6 +496,9 @@ const ClubDNAUltimateDashboard = () => {
             <a href="/frf5" className="text-purple-400 font-medium hover:text-purple-300 transition-colors">
               FRF5 Ultimate
             </a>
+            <a href="/frf6" className="text-white/70 hover:text-white transition-colors">
+              FRF6 Intelligence
+            </a>
           </nav>
         </div>
       </div>
