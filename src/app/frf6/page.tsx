@@ -7,7 +7,7 @@ import {
   PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
 } from 'recharts';
 import { 
-  TrendingDown, TrendingUp, DollarSign, Target,
+  TrendingDown, TrendingUp, PoundSterling, Target,
   Zap, Shield, Clock, Calculator, Eye, RefreshCw, Trophy, Menu, X
 } from 'lucide-react';
 
@@ -471,7 +471,7 @@ const EFL_LIQUIDITY_ANALYZER = () => {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-8">
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
             <div className="flex items-center justify-between">
-              <DollarSign className="w-8 h-8 text-blue-400" />
+              <PoundSterling className="w-8 h-8 text-blue-400" />
               <div className="text-right">
                 <div className="text-xl font-bold">£{(currentData.adjustedRevenue / 1000000).toFixed(1)}M</div>
                 <div className="text-blue-200 text-sm">Annual Revenue</div>
