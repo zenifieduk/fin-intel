@@ -360,13 +360,11 @@ const EFL_LIQUIDITY_ANALYZER = () => {
     // Import the enhanced voice intent system
     const { defaultIntentClassifier } = await import('@/utils/voice-intents');
     
-    // Look for explicit action phrases that Aaran uses to suggest dashboard changes
+    // VERY RESTRICTIVE: Only trigger on explicit dashboard demonstration commands
     const actionPatterns = [
-      /Let me (?:show you|demonstrate)(?: this on the dashboard)?:?\s*(.+?)(?:\.|$)/i,
-      /I'll show you:?\s*(.+?)(?:\.|$)/i,
-      /(?:Show|Try|See)\s+(.+?)(?:\.|$)/i,
-      /Moving to (.+?)(?:\.|$)/i,
-      /Let's look at (.+?)(?:\.|$)/i,
+      /Let me demonstrate this on the dashboard:\s*(.+?)(?:\.|$)/i,
+      /I'll demonstrate:\s*(.+?)(?:\.|$)/i,
+      /Dashboard demonstration:\s*(.+?)(?:\.|$)/i,
     ];
 
     for (const pattern of actionPatterns) {
@@ -446,13 +444,12 @@ const EFL_LIQUIDITY_ANALYZER = () => {
                        (message as ConversationMessage).response;
       console.log('🔥 EXTRACTED MESSAGE TEXT:', messageText);
       
-      // Process both USER commands and AI suggestions
+      // SIMPLIFIED: Only process USER commands - AI suggestions disabled to prevent conversation interference
       if (messageText && message.source === 'user') {
         console.log('✅ Processing USER message for DOM interaction');
         parseAaranMessage(messageText).catch(console.error);
       } else if (messageText && message.source === 'ai') {
-        console.log('🤖 Processing AI response for suggested actions');
-        parseAaranSuggestions(messageText).catch(console.error);
+        console.log('ℹ️ Skipping AI response - user controls dashboard, Aaran provides guidance');
       } else {
         console.log('❌ No message text found in any expected property');
       }
