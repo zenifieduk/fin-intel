@@ -43,25 +43,66 @@ export class VoiceIntentClassifier {
   ]
 
   private namedPositions = {
-    'top': 1,
-    'first': 1, 
-    'championship': 1,
+    // Championship/Top Positions
     'champions': 1,
+    'championship': 1,
+    'top of the league': 1,
+    'first place': 1,
+    'number one': 1,
+    'first': 1,
+    'top': 1,
     'winner': 1,
-    'promotion': 2,
+    
+    // Title race / Automatic promotion
+    'title race': 2,
     'automatic promotion': 2,
-    'playoff': 6,
+    'second place': 2,
+    'runners up': 2,
+    'promotion': 2,
+    
+    // Playoffs
     'playoffs': 6,
+    'playoff': 6,
+    'top six': 6,
+    'playoff final': 6,
     'playoff qualification': 6,
+    
+    // Mid-table
+    'mid-table': 12,
     'mid table': 12,
-    'middle': 12,
     'midtable': 12,
-    'relegation zone': 22,
-    'relegation battle': 20,
+    'safe': 12,
+    'comfortable': 12,
+    'middle': 12,
+    
+    // Survival
+    'survival': 17,
+    'just safe': 17,
+    'above relegation': 17,
+    
+    // The Cliff (relegation boundary)
+    'show the cliff': 18,
+    'financial cliff': 18,
+    'the drop': 18,
+    'cliff edge': 18,
+    'relegation boundary': 18,
+    'the cliff': 18,
+    'cliff': 18,
+    
+    // Relegation battle
+    'relegation battle': 22,
     'bottom three': 22,
+    'danger zone': 22,
+    'fighting relegation': 22,
+    'relegation zone': 22,
+    
+    // Bottom/Relegated
+    'relegation': 24,
     'bottom': 24,
-    'last': 24,
-    'relegated': 24
+    'last place': 24,
+    'relegated': 24,
+    'bottom of the league': 24,
+    'last': 24
   }
 
   private scenarios = {
@@ -136,8 +177,24 @@ export class VoiceIntentClassifier {
       }
     }
 
-    // Check for directional movement
-    if (text.includes('up') || text.includes('higher') || text.includes('improve')) {
+    // Check for movement commands with position calculation
+    const moveUpMatch = text.match(/(move|go)\s*(up|higher)/i)
+    const moveDownMatch = text.match(/(move|go)\s*(down|lower)/i)
+    
+    if (moveUpMatch) {
+      direction = 'up'
+      position = Math.max(1, context.currentPosition - 5) // Move up 5 positions
+      confidence = Math.max(confidence, 0.9)
+      reasoning += `. Movement command (up 5 positions) detected: ${context.currentPosition} → ${position}`
+    } else if (moveDownMatch) {
+      direction = 'down'
+      position = Math.min(24, context.currentPosition + 5) // Move down 5 positions
+      confidence = Math.max(confidence, 0.9)
+      reasoning += `. Movement command (down 5 positions) detected: ${context.currentPosition} → ${position}`
+    }
+    
+    // Check for general directional movement
+    else if (text.includes('up') || text.includes('higher') || text.includes('improve')) {
       direction = 'up'
       confidence = Math.max(confidence, 0.6)
       reasoning += '. Directional movement (up) detected'

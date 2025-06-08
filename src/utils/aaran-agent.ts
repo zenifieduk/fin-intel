@@ -262,7 +262,7 @@ export class AaranAgent {
       case 'POSITION_CHANGE':
         if (intent.parameters.position !== undefined) {
           newPosition = Math.min(24, Math.max(1, intent.parameters.position))
-          response = await this.generateContextualResponse(intent, financialData, newPosition)
+          response = await this.generateSemanticPositionResponse(intent, financialData, newPosition)
           this.context.lastAction = `position_change_to_${newPosition}`
         } else if (intent.parameters.direction) {
           const currentPos = this.context.dashboardState.selectedPosition
@@ -278,7 +278,7 @@ export class AaranAgent {
           }
           this.context.lastAction = `position_move_${intent.parameters.direction}`
         } else {
-          response = "Which position would you like to move to?"
+          response = "Which position would you like to move to? Try 'champions', 'playoffs', 'relegation battle', or 'show the cliff'."
           this.context.lastAction = 'position_clarification_needed'
         }
         break
@@ -464,6 +464,161 @@ export class AaranAgent {
       // Fallback to basic response
       return `Processing ${intent.type.toLowerCase().replace('_', ' ')} request`
     }
+  }
+
+  // Generate semantic response for position changes with contextual understanding
+  private async generateSemanticPositionResponse(intent: Intent, financialData?: FinancialData, targetPosition?: number): Promise<string> {
+    const position = targetPosition || this.context.dashboardState.selectedPosition
+    const currentPosition = this.context.dashboardState.selectedPosition
+    
+    // Get semantic context for the position
+    const positionContext = this.getPositionContext(position)
+    const financialContext = this.getFinancialContext(position, financialData)
+    
+    // Detect if this was a semantic command
+    const semanticTrigger = this.detectSemanticTrigger(intent.originalText.toLowerCase())
+    
+    let response = ''
+    
+    if (semanticTrigger) {
+      // Use semantic trigger in response for better understanding
+      response = `Moving to ${semanticTrigger} - that's ${positionContext.description}. `
+    } else {
+      response = `Moving to position ${position} - ${positionContext.description}. `
+    }
+    
+    // Add financial impact
+    response += financialContext.impact
+    
+    // Add follow-up suggestion based on position category
+    response += ` ${positionContext.followUp}`
+    
+    console.log(`🎯 Semantic position response generated: ${currentPosition} → ${position} (${semanticTrigger || 'numeric'})`)
+    
+    return response
+  }
+
+  // Get contextual information about a position
+  private getPositionContext(position: number): { description: string; followUp: string } {
+    if (position === 1) {
+      return {
+        description: "the top of the league! Champions territory with maximum revenue and prestige",
+        followUp: "Want to see how title-winning finances look in different scenarios?"
+      }
+    } else if (position === 2) {
+      return {
+        description: "title race position! Automatic promotion with massive commercial benefits",
+        followUp: "Shall I show you the playoff pressure by comparing to 6th place?"
+      }
+    } else if (position === 6) {
+      return {
+        description: "playoff qualification! The crucial cut-off for promotion opportunities",
+        followUp: "Want to see the financial cliff by dropping to mid-table?"
+      }
+    } else if (position === 12) {
+      return {
+        description: "safe mid-table territory with steady, predictable finances",
+        followUp: "Would you like to explore what relegation battle looks like?"
+      }
+    } else if (position === 17) {
+      return {
+        description: "survival mode - just above the relegation battle with increasing pressure",
+        followUp: "Want to see the cliff edge by dropping one more position?"
+      }
+    } else if (position === 18) {
+      return {
+        description: "the financial cliff! This is where relegation panic begins and revenues plummet",
+        followUp: "Shall I show you the full relegation battle at 22nd?"
+      }
+    } else if (position === 22) {
+      return {
+        description: "relegation battle! Bottom three territory with severe financial consequences",
+        followUp: "Want to see rock bottom at last place?"
+      }
+    } else if (position === 24) {
+      return {
+        description: "bottom of the league - relegated with devastating financial impact",
+        followUp: "Shall I show you the recovery path back to safety?"
+      }
+    } else if (position <= 6) {
+      return {
+        description: `position ${position} - in the promotion race with enhanced commercial appeal`,
+        followUp: "Want to explore different promotion scenarios?"
+      }
+    } else if (position >= 18) {
+      return {
+        description: `position ${position} - in the relegation zone with reduced revenue and high risk`,
+        followUp: "Shall I show you the escape routes to safety?"
+      }
+    } else {
+      return {
+        description: `position ${position} - mid-table with moderate financial stability`,
+        followUp: "Want to see the contrast with promotion or relegation positions?"
+      }
+    }
+  }
+
+  // Get financial context for position
+  private getFinancialContext(position: number, financialData?: FinancialData): { impact: string } {
+    const revenue = financialData?.totalRevenue || this.context.dashboardState.lastRevenue || 30000000
+    const riskScore = financialData?.riskScore || this.context.dashboardState.lastRiskScore || 50
+    
+    if (position <= 2) {
+      return {
+        impact: `Revenue spikes to £${(revenue / 1000000).toFixed(1)}M with championship bonuses and maximum commercial appeal.`
+      }
+    } else if (position <= 6) {
+      return {
+        impact: `Strong revenue of £${(revenue / 1000000).toFixed(1)}M with playoff bonuses and increased sponsorship value.`
+      }
+    } else if (position <= 17) {
+      return {
+        impact: `Steady revenue of £${(revenue / 1000000).toFixed(1)}M with risk score ${Math.round(riskScore)}/100.`
+      }
+    } else {
+      return {
+        impact: `Revenue drops to £${(revenue / 1000000).toFixed(1)}M with high risk score of ${Math.round(riskScore)}/100 due to relegation threat.`
+      }
+    }
+  }
+
+  // Detect what semantic trigger was used
+  private detectSemanticTrigger(text: string): string | null {
+    const triggers = {
+      'champions': 'champions',
+      'championship': 'championship',
+      'title race': 'title race',
+      'playoffs': 'playoffs', 
+      'playoff': 'playoffs',
+      'promotion': 'promotion',
+      'mid-table': 'mid-table',
+      'safe': 'safe position',
+      'survival': 'survival position',
+      'cliff': 'the financial cliff',
+      'financial cliff': 'the financial cliff',
+      'show the cliff': 'the cliff',
+      'relegation battle': 'relegation battle',
+      'bottom three': 'bottom three',
+      'danger zone': 'danger zone',
+      'relegation': 'relegation',
+      'bottom': 'bottom position'
+    }
+    
+    for (const [trigger, description] of Object.entries(triggers)) {
+      if (text.includes(trigger)) {
+        return description
+      }
+    }
+    
+    // Check for movement commands
+    if (text.includes('move up') || text.includes('go up')) {
+      return 'moving up the table'
+    }
+    if (text.includes('move down') || text.includes('go down')) {
+      return 'moving down the table'
+    }
+    
+    return null
   }
 
   private generateChatResponse(text: string): string {
