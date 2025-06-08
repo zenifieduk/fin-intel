@@ -122,7 +122,8 @@ export class VoiceIntentClassifier {
   classifyIntent(transcript: string, context: ClassificationContext): Intent {
     const normalizedText = transcript.toLowerCase().trim()
     
-    // Start with unknown intent - used as fallback
+    // Start with unknown intent - used as fallback if no candidates match
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const _intent: Intent = {
       type: 'UNKNOWN',
       confidence: 0,
@@ -223,6 +224,7 @@ export class VoiceIntentClassifier {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private classifyScenarioChange(text: string, _context: ClassificationContext): Intent {
     let confidence = 0
     let scenario: string | undefined
@@ -257,6 +259,7 @@ export class VoiceIntentClassifier {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private classifyFinancialQuery(text: string, _context: ClassificationContext): Intent {
     let confidence = 0
     let metric: string | undefined
@@ -324,6 +327,7 @@ export class VoiceIntentClassifier {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private classifyHelpRequest(text: string, _context: ClassificationContext): Intent {
     let confidence = 0
     let reasoning = ''
@@ -366,6 +370,7 @@ export class VoiceIntentClassifier {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private classifyGeneralChat(text: string, _context: ClassificationContext): Intent {
     let confidence = 0
     let reasoning = ''

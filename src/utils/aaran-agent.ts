@@ -363,6 +363,7 @@ export class AaranAgent {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private generateGeneralFinancialResponse(_financialData?: FinancialData): string {
     const position = this.context.dashboardState.selectedPosition
     const revenue = (this.context.dashboardState.lastRevenue / 1000000).toFixed(1)
@@ -718,38 +719,39 @@ export class AaranAgent {
   // Process advanced commands that require dashboard controller
   private async processAdvancedCommand(
     intent: Intent,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     financialData?: FinancialData
   ): Promise<any> {
     const lowerTranscript = intent.originalText.toLowerCase();
 
     // Bulk comparison commands
     if (lowerTranscript.includes('compare') && (lowerTranscript.includes('positions') || lowerTranscript.includes('multiple'))) {
-      return await this.handleBulkComparison(intent, financialData);
+              return await this.handleBulkComparison(intent);
     }
 
     // Export commands
     if (lowerTranscript.includes('export') || lowerTranscript.includes('download')) {
-      return await this.handleExportCommand(intent, financialData);
+              return await this.handleExportCommand(intent);
     }
 
     // Undo/rollback commands
     if (lowerTranscript.includes('undo') || lowerTranscript.includes('go back') || lowerTranscript.includes('rollback')) {
-      return await this.handleUndoCommand(intent, financialData);
+              return await this.handleUndoCommand(intent);
     }
 
     // Reset commands
     if (lowerTranscript.includes('reset') || lowerTranscript.includes('clear') || lowerTranscript.includes('default')) {
-      return await this.handleResetCommand(intent, financialData);
+              return await this.handleResetCommand();
     }
 
     // Analysis commands
     if (lowerTranscript.includes('analyze') || lowerTranscript.includes('analysis') || lowerTranscript.includes('run analysis')) {
-      return await this.handleAnalysisCommand(intent, financialData);
+              return await this.handleAnalysisCommand(intent);
     }
 
     // Confirmation commands
     if (lowerTranscript.startsWith('confirm')) {
-      return await this.handleConfirmationCommand(intent, financialData);
+              return await this.handleConfirmationCommand(intent);
     }
 
     return null; // No advanced command detected
@@ -757,8 +759,7 @@ export class AaranAgent {
 
   // Handle bulk comparison requests
   private async handleBulkComparison(
-    intent: Intent,
-    _financialData?: FinancialData
+    intent: Intent
   ): Promise<any> {
     // Extract positions from transcript (basic parsing)
     const positionMatches = intent.originalText.match(/\d+/g);
@@ -797,8 +798,7 @@ export class AaranAgent {
 
   // Handle export commands
   private async handleExportCommand(
-    intent: Intent,
-    _financialData?: FinancialData
+    intent: Intent
   ): Promise<any> {
     const format = intent.originalText.includes('csv') ? 'csv' : 
                   intent.originalText.includes('pdf') ? 'pdf' : 'json';
@@ -831,8 +831,7 @@ export class AaranAgent {
 
   // Handle undo commands
   private async handleUndoCommand(
-    intent: Intent,
-    _financialData?: FinancialData
+    intent: Intent
   ): Promise<any> {
     const steps = intent.originalText.includes('two') || intent.originalText.includes('2') ? 2 : 1;
     
@@ -852,10 +851,7 @@ export class AaranAgent {
   }
 
   // Handle reset commands
-  private async handleResetCommand(
-    _intent: Intent,
-    _financialData?: FinancialData
-  ): Promise<{
+  private async handleResetCommand(): Promise<{
     response: string;
     newPosition?: number;
     newScenario?: string;
@@ -887,8 +883,7 @@ export class AaranAgent {
 
   // Handle analysis commands
   private async handleAnalysisCommand(
-    intent: Intent,
-    _financialData?: FinancialData
+    intent: Intent
   ): Promise<any> {
     const analysisType = intent.originalText.includes('comprehensive') ? 'comprehensive' :
                         intent.originalText.includes('risk') ? 'risk' :
@@ -917,8 +912,7 @@ export class AaranAgent {
 
   // Handle confirmation commands
   private async handleConfirmationCommand(
-    intent: Intent,
-    _financialData?: FinancialData
+    intent: Intent
   ): Promise<any> {
     const confirmationMatch = intent.originalText.match(/confirm\s+(\w+)/i);
     if (!confirmationMatch) {
@@ -943,6 +937,7 @@ export class AaranAgent {
   }
 
   // Determine focus based on intent
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private determineFocus(intent: Intent, _financialData?: FinancialData): string {
     switch (intent.type) {
       case 'POSITION_CHANGE':
@@ -1166,6 +1161,7 @@ export class AaranAgent {
     return response + randomFollowUp
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private calculateRevenueImpact(currentPos: number, newPos: number, _financialData: FinancialData): number {
     // Simplified revenue impact calculation - each position is worth roughly £400K-500K
     const positionDifference = currentPos - newPos // Negative means moving up (better)

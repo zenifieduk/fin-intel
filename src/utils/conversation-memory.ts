@@ -248,7 +248,9 @@ export class ConversationMemory {
   ): string {
     if (!context.financialData) return response
 
-    const { financialData, position, scenario } = context
+    const { financialData, position } = context
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { scenario } = context
     let enhancement = ''
 
     // Add position-specific financial insights

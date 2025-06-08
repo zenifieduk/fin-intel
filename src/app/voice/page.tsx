@@ -346,80 +346,6 @@ const EFL_LIQUIDITY_ANALYZER = () => {
     }
     
     console.log('🤷 No position or scenario commands detected in message');
-  }, [setSelectedPosition, setScenario]);
-
-  // Parse Aaran's AI suggestions and execute them
-  const parseAaranSuggestions = useCallback(async (messageText: string) => {
-    console.log('🤖 parseAaranSuggestions CALLED with:', messageText);
-    
-    if (!messageText || typeof messageText !== 'string') {
-      console.log('❌ No valid AI messageText provided');
-      return;
-    }
-
-    // Import the enhanced voice intent system
-    const { defaultIntentClassifier } = await import('@/utils/voice-intents');
-    
-    // VERY RESTRICTIVE: Only trigger on explicit dashboard demonstration commands
-    const actionPatterns = [
-      /Let me demonstrate this on the dashboard:\s*(.+?)(?:\.|$)/i,
-      /I'll demonstrate:\s*(.+?)(?:\.|$)/i,
-      /Dashboard demonstration:\s*(.+?)(?:\.|$)/i,
-    ];
-
-    for (const pattern of actionPatterns) {
-      const match = messageText.match(pattern);
-      if (match) {
-        const command = match[1].trim();
-        console.log(`🎯 Found AI action suggestion: "${command}"`);
-        
-        // Use our semantic classifier on the extracted command
-        const classificationContext = {
-          currentPosition: currentPositionRef.current,
-          currentScenario: currentScenarioRef.current,
-          recentIntents: [],
-          conversationHistory: []
-        };
-        
-        const intent = defaultIntentClassifier.classifyIntent(command, classificationContext);
-        
-        console.log(`🎯 AI suggestion classified:`, {
-          type: intent.type,
-          confidence: intent.confidence.toFixed(2),
-          parameters: intent.parameters,
-          reasoning: intent.reasoning
-        });
-        
-        // Execute high-confidence suggestions
-        if (intent.confidence > 0.8) {
-          if (intent.type === 'POSITION_CHANGE' && intent.parameters.position !== undefined) {
-            const newPosition = intent.parameters.position;
-            if (newPosition >= 1 && newPosition <= 24 && newPosition !== currentPositionRef.current) {
-              console.log(`🤖 AI executing position change: ${newPosition}`);
-              currentPositionRef.current = newPosition;
-              setSelectedPosition(newPosition);
-              setAaranActionFeedback(`🤖 Aaran demonstrated: ${command} → Position ${newPosition}`);
-              setTimeout(() => setAaranActionFeedback(null), 4000);
-              return;
-            }
-          }
-          
-          if (intent.type === 'SCENARIO_CHANGE' && intent.parameters.scenario) {
-            const newScenario = intent.parameters.scenario;
-            if (['current', 'optimistic', 'pessimistic'].includes(newScenario) && newScenario !== currentScenarioRef.current) {
-              console.log(`🤖 AI executing scenario change: ${newScenario}`);
-              currentScenarioRef.current = newScenario;
-              setScenario(newScenario as 'current' | 'optimistic' | 'pessimistic');
-              setAaranActionFeedback(`🤖 Aaran demonstrated: ${command} → ${newScenario} scenario`);
-              setTimeout(() => setAaranActionFeedback(null), 4000);
-              return;
-            }
-          }
-        }
-      }
-    }
-    
-    console.log('🤷 No actionable AI suggestions found');
   }, [setSelectedPosition, setScenario]); // Removed selectedPosition and scenario to avoid stale closures
 
   // Aaran Conversation Hook
@@ -444,7 +370,7 @@ const EFL_LIQUIDITY_ANALYZER = () => {
                        (message as ConversationMessage).response;
       console.log('🔥 EXTRACTED MESSAGE TEXT:', messageText);
       
-      // SIMPLIFIED: Only process USER commands - AI suggestions disabled to prevent conversation interference
+      // SIMPLIFIED: Only process USER commands, ignore all AI responses
       if (messageText && message.source === 'user') {
         console.log('✅ Processing USER message for DOM interaction');
         parseAaranMessage(messageText).catch(console.error);
@@ -942,91 +868,6 @@ const EFL_LIQUIDITY_ANALYZER = () => {
           <p className="text-xl text-blue-200 mb-6">
             Real-time position impact analysis revealing the brutal financial reality of Championship football
           </p>
-        </div>
-
-        {/* Voice Commands Available */}
-        <div className="bg-gradient-to-br from-slate-900 to-blue-900 rounded-xl p-6 mb-8">
-          <div className="flex items-center gap-3 mb-6">
-            <Mic className="h-6 w-6 text-cyan-400" />
-            <h3 className="text-xl font-bold text-white">Voice Commands Available</h3>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Position Control */}
-            <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700/50">
-              <h4 className="text-cyan-400 font-semibold mb-3 text-lg">Position Control</h4>
-              <div className="space-y-2 text-sm">
-                <div className="text-slate-300">
-                  <span className="text-cyan-300">&quot;Position 6&quot;</span> - Move to specific position
-                </div>
-                <div className="text-slate-300">
-                  <span className="text-cyan-300">&quot;Champions&quot;</span> - Go to 1st place
-                </div>
-                <div className="text-slate-300">
-                  <span className="text-cyan-300">&quot;Title race&quot;</span> - Go to 2nd place
-                </div>
-                <div className="text-slate-300">
-                  <span className="text-cyan-300">&quot;Playoffs&quot;</span> - Go to playoff positions
-                </div>
-                <div className="text-slate-300">
-                  <span className="text-cyan-300">&quot;Mid table&quot;</span> - Go to position 12
-                </div>
-                <div className="text-slate-300">
-                  <span className="text-cyan-300">&quot;Show the cliff&quot;</span> - Relegation boundary
-                </div>
-                <div className="text-slate-300">
-                  <span className="text-cyan-300">&quot;Relegation battle&quot;</span> - Go to bottom 3
-                </div>
-                <div className="text-slate-300">
-                  <span className="text-cyan-300">&quot;Move up/down&quot;</span> - Adjacent positions
-                </div>
-              </div>
-            </div>
-
-            {/* Scenario Analysis */}
-            <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700/50">
-              <h4 className="text-yellow-400 font-semibold mb-3 text-lg">Scenario Analysis</h4>
-                              <div className="space-y-2 text-sm">
-                  <div className="text-slate-300">
-                    <span className="text-yellow-300">&quot;Best case&quot;</span> - Optimistic scenario
-                  </div>
-                  <div className="text-slate-300">
-                    <span className="text-yellow-300">&quot;Worst case&quot;</span> - Pessimistic scenario
-                  </div>
-                  <div className="text-slate-300">
-                    <span className="text-yellow-300">&quot;Current&quot;</span> - Base case scenario
-                  </div>
-                  <div className="text-slate-300">
-                    <span className="text-yellow-300">&quot;Promotion push&quot;</span> - Optimistic view
-                  </div>
-                  <div className="text-slate-300">
-                    <span className="text-yellow-300">&quot;Relegation scenario&quot;</span> - Pessimistic view
-                  </div>
-                </div>
-            </div>
-
-            {/* Data Queries */}
-            <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700/50">
-              <h4 className="text-green-400 font-semibold mb-3 text-lg">Data Queries</h4>
-                              <div className="space-y-2 text-sm">
-                  <div className="text-slate-300">
-                    <span className="text-green-300">&quot;What revenue&quot;</span> - Current revenue info
-                  </div>
-                  <div className="text-slate-300">
-                    <span className="text-green-300">&quot;What risk&quot;</span> - Current risk assessment
-                  </div>
-                  <div className="text-slate-300">
-                    <span className="text-green-300">&quot;Financial impact&quot;</span> - Position analysis
-                  </div>
-                  <div className="text-slate-300">
-                    <span className="text-green-300">&quot;Compare positions&quot;</span> - Position comparison
-                  </div>
-                  <div className="text-slate-300">
-                    <span className="text-green-300">&quot;Help&quot;</span> - Available commands
-                  </div>
-                </div>
-            </div>
-          </div>
         </div>
 
         {/* Controls */}

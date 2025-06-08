@@ -408,6 +408,7 @@ export class DashboardController {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private generateMetricsForPosition(position: number, scenario: string, analysisType: string): any {
     // Simulate metrics generation
     const baseRevenue = 100 - (position - 1) * 2;
