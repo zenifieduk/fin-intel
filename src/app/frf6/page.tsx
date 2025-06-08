@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { 
   LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, 
   Tooltip, ResponsiveContainer, Cell, RadarChart, 
@@ -244,6 +244,28 @@ const EFL_LIQUIDITY_ANALYZER = () => {
     }
   }), []);
 
+  // Auto-sync position and scenario - position drives scenario selection
+  const getScenarioForPosition = useCallback((position: number): keyof typeof scenarios => {
+    if (position <= 2) return 'title_race';
+    if (position <= 6) return 'promotion_push';
+    if (position <= 17) return 'safe_midtable';
+    if (position <= 21) return 'relegation_battle';
+    return 'financial_crisis';
+  }, []);
+
+  // Auto-update scenario when position changes (if it should change)
+  useEffect(() => {
+    const expectedScenario = getScenarioForPosition(selectedPosition);
+    const currentScenario = scenario as keyof typeof scenarios;
+    
+    // Only auto-sync if the current scenario position doesn't match the selected position
+    // This allows manual scenario selection to override position while keeping them in sync
+    if (scenarios[currentScenario].position !== selectedPosition) {
+      console.log(`🔄 Auto-syncing scenario from ${scenario} to ${expectedScenario} for position ${selectedPosition}`);
+      setScenario(expectedScenario);
+    }
+  }, [selectedPosition, scenario, scenarios, getScenarioForPosition]);
+
   // Calculate current position data with COMPREHENSIVE financial metrics
   const currentData = useMemo(() => {
     const positionData = calculatePositionImpact(selectedPosition);
@@ -258,11 +280,15 @@ const EFL_LIQUIDITY_ANALYZER = () => {
     // Updated wage ratio calculation based on position-specific data
     const actualWageRatio = positionData.wageRatio || (baseClubData.currentWages / adjustedRevenue) * 100;
     
-    const riskScore = (
-      (actualWageRatio / 100) * 40 + // Position-specific wage ratio impact
-      (selectedPosition / 24) * 30 + // Position risk
-      (scenarioData.riskFactor - 1) * 30 // Scenario risk
+    // Position is primary driver, scenario modifies it
+    const basePositionRisk = (
+      (actualWageRatio / 100) * 50 + // Position-specific wage ratio (main factor)
+      (selectedPosition / 24) * 40   // Position risk (major factor)
     );
+    
+    // Scenario provides minor adjustment (+/- 10 points max) 
+    const scenarioAdjustment = (scenarioData.riskFactor - 1) * 10;
+    const riskScore = basePositionRisk + scenarioAdjustment;
 
     return {
       ...positionData,
