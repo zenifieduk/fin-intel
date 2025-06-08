@@ -122,8 +122,8 @@ export class VoiceIntentClassifier {
   classifyIntent(transcript: string, context: ClassificationContext): Intent {
     const normalizedText = transcript.toLowerCase().trim()
     
-    // Start with unknown intent
-    const intent: Intent = {
+    // Start with unknown intent - used as fallback
+    const _intent: Intent = {
       type: 'UNKNOWN',
       confidence: 0,
       parameters: {},
@@ -223,7 +223,7 @@ export class VoiceIntentClassifier {
     }
   }
 
-  private classifyScenarioChange(text: string, context: ClassificationContext): Intent {
+  private classifyScenarioChange(text: string, _context: ClassificationContext): Intent {
     let confidence = 0
     let scenario: string | undefined
     let reasoning = ''
@@ -257,7 +257,7 @@ export class VoiceIntentClassifier {
     }
   }
 
-  private classifyFinancialQuery(text: string, context: ClassificationContext): Intent {
+  private classifyFinancialQuery(text: string, _context: ClassificationContext): Intent {
     let confidence = 0
     let metric: string | undefined
     let comparison = false
@@ -324,7 +324,7 @@ export class VoiceIntentClassifier {
     }
   }
 
-  private classifyHelpRequest(text: string, context: ClassificationContext): Intent {
+  private classifyHelpRequest(text: string, _context: ClassificationContext): Intent {
     let confidence = 0
     let reasoning = ''
 
@@ -366,7 +366,7 @@ export class VoiceIntentClassifier {
     }
   }
 
-  private classifyGeneralChat(text: string, context: ClassificationContext): Intent {
+  private classifyGeneralChat(text: string, _context: ClassificationContext): Intent {
     let confidence = 0
     let reasoning = ''
 

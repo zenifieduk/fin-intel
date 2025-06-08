@@ -9,11 +9,9 @@ import {
 import { 
     TrendingDown, TrendingUp, PoundSterling, Target,
     Zap, Shield, Clock, Calculator, Eye, RefreshCw, Trophy, Menu, X, MessageCircle,
-    PhoneOff, Loader2, Phone
+    Loader2, Mic, MicOff
   } from 'lucide-react';
 import { useConversation } from '@elevenlabs/react';
-import { Button } from "@/components/ui/button";
-import { AaranTextChat } from "@/components/AaranTextChat";
 import { ConversationMessage } from "@/types/speech";
 
 const EFL_LIQUIDITY_ANALYZER = () => {
@@ -34,15 +32,13 @@ const EFL_LIQUIDITY_ANALYZER = () => {
     currentScenarioRef.current = scenario;
   }, [scenario]);
   
-      // Aaran Assistant State
-      const [showAaranInterface, setShowAaranInterface] = useState(false);
-    const [showChatInterface, setShowChatInterface] = useState(false);
+      // Aaran Assistant State - Simplified
   const [hasRequestedMicPermission, setHasRequestedMicPermission] = useState(false);
   const [micPermissionGranted, setMicPermissionGranted] = useState<boolean | null>(null);
       const [aaranActionFeedback, setAaranActionFeedback] = useState<string | null>(null);
 
   // Aaran Message Parser for DOM Interactions
-  const parseAaranMessage = useCallback((messageText: string) => {
+  const parseAaranMessage = useCallback(async (messageText: string) => {
     console.log('🚀 parseAaranMessage CALLED with:', messageText);
     console.log('🚀 typeof setSelectedPosition:', typeof setSelectedPosition);
     console.log('🚀 typeof setScenario:', typeof setScenario);
@@ -111,7 +107,57 @@ const EFL_LIQUIDITY_ANALYZER = () => {
       /(?:what about|how about)\s+(?:position\s+)?(twenty-four|twenty-three|twenty-two|twenty-one|twenty|nineteen|eighteen|seventeen|sixteen|fifteen|fourteen|thirteen|twelve|eleven|ten|nine|eight|seven|six|five|four|three|two|one)/i
     ];
 
-    // SIMPLIFIED: Essential contextual commands only
+    // ENHANCED: Use AaranAgent for semantic understanding
+    // Import the enhanced voice intent system
+    const { defaultIntentClassifier } = await import('@/utils/voice-intents');
+    
+    // Use the same classification context as the voice system
+    const classificationContext = {
+      currentPosition: currentPosition,
+      currentScenario: currentScenarioValue,
+      recentIntents: [],
+      conversationHistory: []
+    };
+    
+    // Classify the intent using our enhanced system
+    const intent = defaultIntentClassifier.classifyIntent(messageText, classificationContext);
+    
+    console.log(`🎯 Intent classified:`, {
+      type: intent.type,
+      confidence: intent.confidence.toFixed(2),
+      parameters: intent.parameters,
+      reasoning: intent.reasoning
+    });
+    
+    // Process position changes using the enhanced system
+    if (intent.type === 'POSITION_CHANGE' && intent.confidence > 0.7 && intent.parameters.position !== undefined) {
+      const newPosition = intent.parameters.position;
+      
+      if (newPosition >= 1 && newPosition <= 24 && newPosition !== currentPosition) {
+        console.log(`🎯 Enhanced intent: setting position to ${newPosition} (${intent.reasoning})`);
+        currentPositionRef.current = newPosition;
+        setSelectedPosition(newPosition);
+        setAaranActionFeedback(`🎤 Aaran moved to position ${newPosition} (${intent.reasoning.split('"')[1] || 'semantic command'})`);
+        setTimeout(() => setAaranActionFeedback(null), 3000);
+        return;
+      }
+    }
+    
+    // Process scenario changes using the enhanced system
+    if (intent.type === 'SCENARIO_CHANGE' && intent.confidence > 0.7 && intent.parameters.scenario) {
+      const newScenario = intent.parameters.scenario;
+      
+      if (['current', 'optimistic', 'pessimistic'].includes(newScenario) && newScenario !== currentScenarioValue) {
+        console.log(`🎯 Enhanced intent: setting scenario to ${newScenario}`);
+        currentScenarioRef.current = newScenario;
+        setScenario(newScenario as 'current' | 'optimistic' | 'pessimistic');
+        setAaranActionFeedback(`🎤 Aaran set scenario to ${newScenario}`);
+        setTimeout(() => setAaranActionFeedback(null), 3000);
+        return;
+      }
+    }
+
+    // FALLBACK: Essential contextual commands for low-confidence cases
     const contextualCommands = [
       // Basic movement requests
       { pattern: /(?:show|see|look at).*(?:relegation zone|bottom)/i, action: () => { setSelectedPosition(22); return 22; }},
@@ -300,6 +346,82 @@ const EFL_LIQUIDITY_ANALYZER = () => {
     }
     
     console.log('🤷 No position or scenario commands detected in message');
+  }, [setSelectedPosition, setScenario]);
+
+  // Parse Aaran's AI suggestions and execute them
+  const parseAaranSuggestions = useCallback(async (messageText: string) => {
+    console.log('🤖 parseAaranSuggestions CALLED with:', messageText);
+    
+    if (!messageText || typeof messageText !== 'string') {
+      console.log('❌ No valid AI messageText provided');
+      return;
+    }
+
+    // Import the enhanced voice intent system
+    const { defaultIntentClassifier } = await import('@/utils/voice-intents');
+    
+    // Look for explicit action phrases that Aaran uses to suggest dashboard changes
+    const actionPatterns = [
+      /Let me (?:show you|demonstrate)(?: this on the dashboard)?:?\s*(.+?)(?:\.|$)/i,
+      /I'll show you:?\s*(.+?)(?:\.|$)/i,
+      /(?:Show|Try|See)\s+(.+?)(?:\.|$)/i,
+      /Moving to (.+?)(?:\.|$)/i,
+      /Let's look at (.+?)(?:\.|$)/i,
+    ];
+
+    for (const pattern of actionPatterns) {
+      const match = messageText.match(pattern);
+      if (match) {
+        const command = match[1].trim();
+        console.log(`🎯 Found AI action suggestion: "${command}"`);
+        
+        // Use our semantic classifier on the extracted command
+        const classificationContext = {
+          currentPosition: currentPositionRef.current,
+          currentScenario: currentScenarioRef.current,
+          recentIntents: [],
+          conversationHistory: []
+        };
+        
+        const intent = defaultIntentClassifier.classifyIntent(command, classificationContext);
+        
+        console.log(`🎯 AI suggestion classified:`, {
+          type: intent.type,
+          confidence: intent.confidence.toFixed(2),
+          parameters: intent.parameters,
+          reasoning: intent.reasoning
+        });
+        
+        // Execute high-confidence suggestions
+        if (intent.confidence > 0.8) {
+          if (intent.type === 'POSITION_CHANGE' && intent.parameters.position !== undefined) {
+            const newPosition = intent.parameters.position;
+            if (newPosition >= 1 && newPosition <= 24 && newPosition !== currentPositionRef.current) {
+              console.log(`🤖 AI executing position change: ${newPosition}`);
+              currentPositionRef.current = newPosition;
+              setSelectedPosition(newPosition);
+              setAaranActionFeedback(`🤖 Aaran demonstrated: ${command} → Position ${newPosition}`);
+              setTimeout(() => setAaranActionFeedback(null), 4000);
+              return;
+            }
+          }
+          
+          if (intent.type === 'SCENARIO_CHANGE' && intent.parameters.scenario) {
+            const newScenario = intent.parameters.scenario;
+            if (['current', 'optimistic', 'pessimistic'].includes(newScenario) && newScenario !== currentScenarioRef.current) {
+              console.log(`🤖 AI executing scenario change: ${newScenario}`);
+              currentScenarioRef.current = newScenario;
+              setScenario(newScenario as 'current' | 'optimistic' | 'pessimistic');
+              setAaranActionFeedback(`🤖 Aaran demonstrated: ${command} → ${newScenario} scenario`);
+              setTimeout(() => setAaranActionFeedback(null), 4000);
+              return;
+            }
+          }
+        }
+      }
+    }
+    
+    console.log('🤷 No actionable AI suggestions found');
   }, [setSelectedPosition, setScenario]); // Removed selectedPosition and scenario to avoid stale closures
 
   // Aaran Conversation Hook
@@ -324,12 +446,13 @@ const EFL_LIQUIDITY_ANALYZER = () => {
                        (message as ConversationMessage).response;
       console.log('🔥 EXTRACTED MESSAGE TEXT:', messageText);
       
-      // SIMPLIFIED: Only process USER commands, ignore all AI responses
+      // Process both USER commands and AI suggestions
       if (messageText && message.source === 'user') {
         console.log('✅ Processing USER message for DOM interaction');
-        parseAaranMessage(messageText);
+        parseAaranMessage(messageText).catch(console.error);
       } else if (messageText && message.source === 'ai') {
-        console.log('ℹ️ Skipping AI response - user controls dashboard, Aaran provides guidance');
+        console.log('🤖 Processing AI response for suggested actions');
+        parseAaranSuggestions(messageText).catch(console.error);
       } else {
         console.log('❌ No message text found in any expected property');
       }
@@ -377,38 +500,13 @@ const EFL_LIQUIDITY_ANALYZER = () => {
     }
   }, [conversation]);
 
-  const handleToggleAaran = () => {
-    if (showAaranInterface || showChatInterface) {
-      // Close interface
-      setShowAaranInterface(false);
-      setShowChatInterface(false);
-      if (conversation.status === 'connected') {
-        endConversation();
-      }
+  const handleToggleAaran = async () => {
+    if (conversation.status === 'connected') {
+      // If connected, end conversation
+      endConversation();
     } else {
-      // Open voice interface
-      setShowAaranInterface(true);
-    }
-  };
-
-  const handleOpenAaranChat = () => {
-    setShowAaranInterface(false);
-    setShowChatInterface(true);
-  };
-
-  const handleCloseAaran = () => {
-    setShowAaranInterface(false);
-    setShowChatInterface(false);
-    if (conversation.status === 'connected') {
-      endConversation();
-    }
-  };
-
-  const handleBackToDemo = () => {
-    setShowAaranInterface(false);
-    setShowChatInterface(false);
-    if (conversation.status === 'connected') {
-      endConversation();
+      // If disconnected, start conversation
+      await startConversationWithAaran();
     }
   };
 
@@ -746,15 +844,13 @@ const EFL_LIQUIDITY_ANALYZER = () => {
               FRF6 Intelligence
             </a>
             <div className="ml-auto">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-slate-600 hover:text-red-600 hover:bg-red-50"
+              <button
+                className="text-slate-600 hover:text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2"
                 onClick={handleToggleAaran}
               >
-                                  <MessageCircle className="h-4 w-4 mr-2" />
-                  <span>Ask Aaran</span>
-              </Button>
+                <MessageCircle className="h-4 w-4" />
+                <span>Ask Aaran</span>
+              </button>
             </div>
           </nav>
         </div>
@@ -849,6 +945,91 @@ const EFL_LIQUIDITY_ANALYZER = () => {
           <p className="text-xl text-blue-200 mb-6">
             Real-time position impact analysis revealing the brutal financial reality of Championship football
           </p>
+        </div>
+
+        {/* Voice Commands Available */}
+        <div className="bg-gradient-to-br from-slate-900 to-blue-900 rounded-xl p-6 mb-8">
+          <div className="flex items-center gap-3 mb-6">
+            <Mic className="h-6 w-6 text-cyan-400" />
+            <h3 className="text-xl font-bold text-white">Voice Commands Available</h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Position Control */}
+            <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700/50">
+              <h4 className="text-cyan-400 font-semibold mb-3 text-lg">Position Control</h4>
+              <div className="space-y-2 text-sm">
+                <div className="text-slate-300">
+                  <span className="text-cyan-300">&quot;Position 6&quot;</span> - Move to specific position
+                </div>
+                <div className="text-slate-300">
+                  <span className="text-cyan-300">&quot;Champions&quot;</span> - Go to 1st place
+                </div>
+                <div className="text-slate-300">
+                  <span className="text-cyan-300">&quot;Title race&quot;</span> - Go to 2nd place
+                </div>
+                <div className="text-slate-300">
+                  <span className="text-cyan-300">&quot;Playoffs&quot;</span> - Go to playoff positions
+                </div>
+                <div className="text-slate-300">
+                  <span className="text-cyan-300">&quot;Mid table&quot;</span> - Go to position 12
+                </div>
+                <div className="text-slate-300">
+                  <span className="text-cyan-300">&quot;Show the cliff&quot;</span> - Relegation boundary
+                </div>
+                <div className="text-slate-300">
+                  <span className="text-cyan-300">&quot;Relegation battle&quot;</span> - Go to bottom 3
+                </div>
+                <div className="text-slate-300">
+                  <span className="text-cyan-300">&quot;Move up/down&quot;</span> - Adjacent positions
+                </div>
+              </div>
+            </div>
+
+            {/* Scenario Analysis */}
+            <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700/50">
+              <h4 className="text-yellow-400 font-semibold mb-3 text-lg">Scenario Analysis</h4>
+                              <div className="space-y-2 text-sm">
+                  <div className="text-slate-300">
+                    <span className="text-yellow-300">&quot;Best case&quot;</span> - Optimistic scenario
+                  </div>
+                  <div className="text-slate-300">
+                    <span className="text-yellow-300">&quot;Worst case&quot;</span> - Pessimistic scenario
+                  </div>
+                  <div className="text-slate-300">
+                    <span className="text-yellow-300">&quot;Current&quot;</span> - Base case scenario
+                  </div>
+                  <div className="text-slate-300">
+                    <span className="text-yellow-300">&quot;Promotion push&quot;</span> - Optimistic view
+                  </div>
+                  <div className="text-slate-300">
+                    <span className="text-yellow-300">&quot;Relegation scenario&quot;</span> - Pessimistic view
+                  </div>
+                </div>
+            </div>
+
+            {/* Data Queries */}
+            <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700/50">
+              <h4 className="text-green-400 font-semibold mb-3 text-lg">Data Queries</h4>
+                              <div className="space-y-2 text-sm">
+                  <div className="text-slate-300">
+                    <span className="text-green-300">&quot;What revenue&quot;</span> - Current revenue info
+                  </div>
+                  <div className="text-slate-300">
+                    <span className="text-green-300">&quot;What risk&quot;</span> - Current risk assessment
+                  </div>
+                  <div className="text-slate-300">
+                    <span className="text-green-300">&quot;Financial impact&quot;</span> - Position analysis
+                  </div>
+                  <div className="text-slate-300">
+                    <span className="text-green-300">&quot;Compare positions&quot;</span> - Position comparison
+                  </div>
+                  <div className="text-slate-300">
+                    <span className="text-green-300">&quot;Help&quot;</span> - Available commands
+                  </div>
+                </div>
+            </div>
+          </div>
         </div>
 
         {/* Controls */}
@@ -1293,139 +1474,57 @@ const EFL_LIQUIDITY_ANALYZER = () => {
         </div>
       </div>
 
-      {/* Floating Aaran Assistant Button */}
-      <button
-        className="fixed bottom-6 right-6 bg-red-600 hover:bg-red-700 text-white p-4 rounded-full shadow-lg z-40 transition-all duration-200 hover:scale-105"
-        onClick={handleToggleAaran}
-        title="Ask Aaran about Financial Data"
-      >
-                  <MessageCircle className="h-6 w-6" />
-        <span className="sr-only">Ask Aaran about Financial Data</span>
-      </button>
-
-      {/* Aaran Interface */}
-      {(showAaranInterface || showChatInterface) && (
-        <div className="fixed bottom-24 right-6 w-80 bg-white rounded-lg shadow-xl border border-slate-200 z-50">
-          {showChatInterface ? (
+      {/* Simplified Aaran Voice Assistant - Microphone & Status Only */}
+      <div className="fixed bottom-6 right-6 flex flex-col items-center gap-2 z-40">
+        {/* Status Indicator */}
+        <div className="flex items-center gap-1 bg-slate-900/90 backdrop-blur text-white px-2 py-1 rounded-full text-xs">
+          {conversation.status === 'connected' && (
             <>
-              <div className="flex items-center justify-between p-4 border-b border-slate-200">
-                <h3 className="text-lg font-bold text-slate-900">Chat with Aaran</h3>
-                <button
-                  onClick={handleCloseAaran}
-                  className="text-slate-400 hover:text-slate-600"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-              <AaranTextChat
-                agentId="agent_01jx2dwz4yeke9dzh7bwjacdxh"
-                onBack={handleBackToDemo}
-                title="Chat with Aaran"
-              />
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span>Connected</span>
             </>
-          ) : (
+          )}
+          {conversation.status === 'connecting' && (
             <>
-              <div className="flex items-center justify-between p-4 border-b border-slate-200">
-                <h3 className="text-lg font-bold text-slate-900">Talk to Aaran</h3>
-                <button
-                  onClick={handleCloseAaran}
-                  className="text-slate-400 hover:text-slate-600"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-              
-              <div className="p-4 space-y-4">
-                {/* Status Display */}
-                <div className="flex items-center space-x-2">
-                  {conversation.status === 'connected' && (
-                    <>
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      <span className="text-sm text-green-600">Connected</span>
-                    </>
-                  )}
-                  {conversation.status === 'connecting' && (
-                    <>
-                      <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
-                      <span className="text-sm text-yellow-600">Connecting...</span>
-                    </>
-                  )}
-                  {conversation.status === 'disconnected' && (
-                    <>
-                      <div className="w-2 h-2 bg-slate-400 rounded-full"></div>
-                      <span className="text-sm text-slate-500">Ready to connect</span>
-                    </>
-                  )}
-                </div>
-
-                {/* Speaking Status */}
-                {conversation.status === 'connected' && conversation.isSpeaking && (
-                  <div className="flex items-center space-x-2 bg-blue-50 p-2 rounded">
-                    <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-                    <span className="font-medium">Aaran speaking...</span>
-                  </div>
-                )}
-
-                                  {/* Help Text */}
-                  <div className="text-xs text-slate-500 space-y-1">
-                    <div>💡 Try: &quot;Show me position 6&quot;</div>
-                    <div>💡 Or: &quot;Move even lower&quot;</div>
-                    <div>💡 Or: &quot;Try optimistic scenario&quot;</div>
-                  </div>
-
-                  {/* Test Button for DOM Interaction */}
-                  <div className="border-t pt-2">
-                    <button
-                      onClick={() => {
-                        console.log('🧪 TEST BUTTON CLICKED!');
-                        console.log('🧪 Current position before test:', selectedPosition);
-                        parseAaranMessage("show me position six");
-                        console.log('🧪 Current position after test:', selectedPosition);
-                      }}
-                      className="w-full text-xs bg-purple-100 hover:bg-purple-200 text-purple-700 px-2 py-1 rounded"
-                    >
-                      🧪 Test: Show me position six
-                    </button>
-                  </div>
-
-                {/* Voice Controls */}
-                <div className="flex space-x-2">
-                  {conversation.status === 'disconnected' ? (
-                    <Button
-                      onClick={startConversationWithAaran}
-                      className="flex-1 bg-green-600 hover:bg-green-700"
-                      disabled={!micPermissionGranted && hasRequestedMicPermission}
-                    >
-                      <Phone className="h-4 w-4 mr-2" />
-                      {hasRequestedMicPermission && !micPermissionGranted 
-                        ? 'Mic Access Needed' 
-                        : 'Start Voice Chat'
-                      }
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={endConversation}
-                      variant="destructive"
-                      className="flex-1"
-                    >
-                      <PhoneOff className="h-4 w-4 mr-2" />
-                      End Call
-                    </Button>
-                  )}
-                  
-                  <Button
-                    onClick={handleOpenAaranChat}
-                    variant="outline"
-                    size="sm"
-                  >
-                    💬
-                  </Button>
-                </div>
-              </div>
+              <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+              <span>Connecting</span>
+            </>
+          )}
+          {conversation.status === 'disconnected' && (
+            <>
+              <div className="w-2 h-2 bg-slate-400 rounded-full"></div>
+              <span>Aaran</span>
+            </>
+          )}
+          {conversation.status === 'connected' && conversation.isSpeaking && (
+            <>
+              <Loader2 className="h-3 w-3 animate-spin text-blue-400" />
+              <span>Speaking</span>
             </>
           )}
         </div>
-      )}
+
+        {/* Microphone Button */}
+        <button
+          className={`p-4 rounded-full shadow-lg transition-all duration-200 hover:scale-105 ${
+            conversation.status === 'connected' 
+              ? 'bg-red-600 hover:bg-red-700' 
+              : 'bg-green-600 hover:bg-green-700'
+          } text-white`}
+          onClick={handleToggleAaran}
+          title={conversation.status === 'connected' ? "End conversation with Aaran" : "Start conversation with Aaran"}
+          disabled={conversation.status === 'connecting' || (!micPermissionGranted && hasRequestedMicPermission)}
+        >
+          {conversation.status === 'connected' ? (
+            <MicOff className="h-6 w-6" />
+          ) : (
+            <Mic className="h-6 w-6" />
+          )}
+          <span className="sr-only">
+            {conversation.status === 'connected' ? "End conversation" : "Start conversation"} with Aaran
+          </span>
+        </button>
+      </div>
     </div>
   );
 };

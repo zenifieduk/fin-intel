@@ -853,8 +853,8 @@ export class AaranAgent {
 
   // Handle reset commands
   private async handleResetCommand(
-    intent: Intent,
-    financialData?: FinancialData
+    _intent: Intent,
+    _financialData?: FinancialData
   ): Promise<{
     response: string;
     newPosition?: number;
@@ -1166,7 +1166,7 @@ export class AaranAgent {
     return response + randomFollowUp
   }
 
-  private calculateRevenueImpact(currentPos: number, newPos: number, financialData: FinancialData): number {
+  private calculateRevenueImpact(currentPos: number, newPos: number, _financialData: FinancialData): number {
     // Simplified revenue impact calculation - each position is worth roughly £400K-500K
     const positionDifference = currentPos - newPos // Negative means moving up (better)
     const averageImpactPerPosition = 450000 // £450K per position
