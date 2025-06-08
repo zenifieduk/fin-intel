@@ -16,12 +16,12 @@ import { ConversationMessage } from "@/types/speech";
 
 const EFL_LIQUIDITY_ANALYZER = () => {
   const [selectedPosition, setSelectedPosition] = useState(12);
-  const [scenario, setScenario] = useState('current');
+  const [scenario, setScenario] = useState('safe_midtable');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // Refs to track current values for parseAaranMessage
   const currentPositionRef = useRef(12);
-  const currentScenarioRef = useRef('current');
+  const currentScenarioRef = useRef('safe_midtable');
   
   // Update refs whenever state changes
   useEffect(() => {
@@ -147,11 +147,19 @@ const EFL_LIQUIDITY_ANALYZER = () => {
     if (intent.type === 'SCENARIO_CHANGE' && intent.confidence > 0.7 && intent.parameters.scenario) {
       const newScenario = intent.parameters.scenario;
       
-      if (['current', 'optimistic', 'pessimistic'].includes(newScenario) && newScenario !== currentScenarioValue) {
+      if (['title_race', 'promotion_push', 'safe_midtable', 'relegation_battle', 'financial_crisis'].includes(newScenario) && newScenario !== currentScenarioValue) {
         console.log(`🎯 Enhanced intent: setting scenario to ${newScenario}`);
         currentScenarioRef.current = newScenario;
-        setScenario(newScenario as 'current' | 'optimistic' | 'pessimistic');
-        setAaranActionFeedback(`🎤 Aaran set scenario to ${newScenario}`);
+        setScenario(newScenario as keyof typeof scenarios);
+        
+        // Also update position to match the scenario
+        const scenarioData = scenarios[newScenario as keyof typeof scenarios];
+        if (scenarioData.position) {
+          setSelectedPosition(scenarioData.position);
+          currentPositionRef.current = scenarioData.position;
+        }
+        
+        setAaranActionFeedback(`🎤 Aaran set scenario to ${newScenario} (position ${scenarioData.position})`);
         setTimeout(() => setAaranActionFeedback(null), 3000);
         return;
       }
@@ -324,14 +332,22 @@ const EFL_LIQUIDITY_ANALYZER = () => {
           newScenario = 'pessimistic';
         }
         
-        if (['current', 'optimistic', 'pessimistic'].includes(newScenario)) {
+        if (['title_race', 'promotion_push', 'safe_midtable', 'relegation_battle', 'financial_crisis'].includes(newScenario)) {
           if (newScenario !== currentScenarioValue) {
             console.log(`🎯 Aaran setting scenario to: ${newScenario}`);
             
             // Update scenario
             currentScenarioRef.current = newScenario; // Update ref immediately
-            setScenario(newScenario as 'current' | 'optimistic' | 'pessimistic');
-            setAaranActionFeedback(`🎤 Aaran set scenario to ${newScenario}`);
+            setScenario(newScenario as keyof typeof scenarios);
+            
+            // Also update position to match the scenario
+            const scenarioData = scenarios[newScenario as keyof typeof scenarios];
+            if (scenarioData.position) {
+              setSelectedPosition(scenarioData.position);
+              currentPositionRef.current = scenarioData.position;
+            }
+            
+            setAaranActionFeedback(`🎤 Aaran set scenario to ${newScenario} (position ${scenarioData.position})`);
             setTimeout(() => setAaranActionFeedback(null), 3000);
             
             return; // Exit after first match
@@ -346,7 +362,8 @@ const EFL_LIQUIDITY_ANALYZER = () => {
     }
     
     console.log('🤷 No position or scenario commands detected in message');
-  }, [setSelectedPosition, setScenario]); // Removed selectedPosition and scenario to avoid stale closures
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setSelectedPosition, setScenario]); // scenarios is static, safe to omit
 
   // Aaran Conversation Hook
   const conversation = useConversation({
@@ -622,11 +639,43 @@ const EFL_LIQUIDITY_ANALYZER = () => {
     };
   }, [baseClubData]);
 
-  // Scenario calculations
+  // Enhanced Scenario system - realistic Championship scenarios that update position
   const scenarios = useMemo(() => ({
-    current: { name: "Current Trajectory", multiplier: 1.0, riskFactor: 1.0 },
-    optimistic: { name: "3-Position Improvement", multiplier: 1.15, riskFactor: 0.7 },
-    pessimistic: { name: "Relegation Battle", multiplier: 0.82, riskFactor: 1.8 }
+    title_race: { 
+      name: "Title Race", 
+      position: 1, 
+      multiplier: 1.0, 
+      riskFactor: 0.5,
+      description: "Fighting for automatic promotion - championship winning position"
+    },
+    promotion_push: { 
+      name: "Promotion Push", 
+      position: 3, 
+      multiplier: 1.0, 
+      riskFactor: 0.7,
+      description: "Strong playoff contention - targeting Premier League promotion"
+    },
+    safe_midtable: { 
+      name: "Safe Mid-Table", 
+      position: 12, 
+      multiplier: 1.0, 
+      riskFactor: 1.0,
+      description: "Comfortable mid-table position - no immediate pressure"
+    },
+    relegation_battle: { 
+      name: "Relegation Battle", 
+      position: 20, 
+      multiplier: 1.0, 
+      riskFactor: 2.2,
+      description: "Fighting relegation to League One - critical financial situation"
+    },
+    financial_crisis: { 
+      name: "Financial Crisis", 
+      position: 23, 
+      multiplier: 0.85, 
+      riskFactor: 3.0,
+      description: "Emergency measures - administration risk, fire sale scenario"
+    }
   }), []);
 
   // Calculate current position data with COMPREHENSIVE financial metrics
@@ -898,14 +947,24 @@ const EFL_LIQUIDITY_ANALYZER = () => {
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-            <label className="block text-sm font-medium mb-2">Scenario Analysis</label>
+            <label className="block text-sm font-medium mb-2">Championship Scenarios</label>
             <select
               value={scenario}
-              onChange={(e) => setScenario(e.target.value)}
+              onChange={(e) => {
+                const newScenario = e.target.value as keyof typeof scenarios;
+                setScenario(newScenario);
+                const scenarioData = scenarios[newScenario];
+                if (scenarioData.position) {
+                  setSelectedPosition(scenarioData.position);
+                  currentPositionRef.current = scenarioData.position;
+                }
+              }}
               className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white"
             >
               {Object.entries(scenarios).map(([key, data]) => (
-                <option key={key} value={key}>{data.name}</option>
+                <option key={key} value={key}>
+                  {data.name} (Pos {data.position})
+                </option>
               ))}
             </select>
           </div>
@@ -981,7 +1040,11 @@ const EFL_LIQUIDITY_ANALYZER = () => {
               <LineChart data={cashProjection}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
                 <XAxis dataKey="month" stroke="#ffffff80" />
-                <YAxis stroke="#ffffff80" tickFormatter={(value) => `£${(value/1000000).toFixed(1)}M`} />
+                <YAxis 
+                  stroke="#ffffff80" 
+                  domain={[0, 50000000]} 
+                  tickFormatter={(value) => `£${(value/1000000).toFixed(1)}M`} 
+                />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: '#1e293b', 
