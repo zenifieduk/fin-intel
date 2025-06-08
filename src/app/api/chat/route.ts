@@ -87,7 +87,26 @@ async function generateAIResponse(userMessage: string, history: Message[]): Prom
 
   // Greeting detection
   if (isFirstMessage && (message.includes('hello') || message.includes('hi') || message.includes('hey') || message.includes('good'))) {
-    return "Hello! I'm Ellie, Alan Batt's AI property assistant. I'm here to help you find the perfect property, book viewings, and answer any questions about our services. What can I help you with today?"
+    return "Hello! I'm Ellie, your AI assistant. I can help with both property services and financial analysis. Whether you're looking for property advice or need help understanding football club economics and the FRF7 dashboard, I'm here to assist. What can I help you with today?"
+  }
+
+  // Financial and football club queries
+  if (message.includes('position') || message.includes('league') || message.includes('financial') || message.includes('revenue') || message.includes('wages') || message.includes('frf7') || message.includes('dashboard') || message.includes('club') || message.includes('football')) {
+    if (message.includes('position') && (message.includes('12') || message.includes('twelve'))) {
+      return "Position 12 is right in the middle of the Championship table! At this position, a club typically generates around £22-24M in revenue with manageable risk levels. Key financial impacts:\n\n• **Revenue**: £22-24M annually\n• **Risk Level**: Moderate (safe from relegation pressure)\n• **Wage Ratio**: Around 85-90% (borderline sustainable)\n• **Commercial Impact**: Steady sponsorship values\n• **Fan Engagement**: Mid-table apathy may affect attendance\n\nPosition 12 offers stability but limited growth potential. Would you like me to compare this with other league positions or explain specific financial metrics?"
+    }
+    
+    if (message.includes('revenue') || message.includes('income') || message.includes('money')) {
+      return "Football club revenue is fascinating! In the Championship, revenue varies dramatically by league position:\n\n**Key Revenue Streams:**\n• **TV Payments**: £800k-£12M based on position\n• **Commercial Deals**: Heavily influenced by league standing\n• **Matchday Revenue**: Attendance varies with performance\n• **Prize Money**: Promotion bonuses can exceed £200M\n\n**Position Impact Examples:**\n• **1st Place**: £35M+ (promotion certainty)\n• **6th Place**: £28M (playoff excitement)\n• **12th Place**: £22M (mid-table stability)\n• **22nd Place**: £15M (relegation fear)\n\nWhich aspect of football club revenue interests you most?"
+    }
+    
+    if (message.includes('dashboard') || message.includes('frf7') || message.includes('navigate')) {
+      return "I can help you navigate the FRF7 financial dashboard! Here's what each section shows:\n\n**Dashboard Features:**\n📊 **Position Selector**: Choose any league position (1-24)\n📈 **Revenue Analysis**: Real-time financial impact calculations\n⚠️ **Risk Assessment**: Financial sustainability indicators\n💰 **Cash Flow**: Monthly burn rate and liquidity analysis\n🎯 **Scenario Planning**: Current vs. optimistic projections\n\n**Key Metrics to Watch:**\n• Total Revenue vs. League Position\n• Wage-to-Revenue Ratio (aim for <80%)\n• Monthly Cash Flow (positive = sustainable)\n• Days of Cash Remaining\n\nWhat specific area of the dashboard would you like me to explain in detail?"
+    }
+    
+    if (message.includes('risk') || message.includes('sustainable') || message.includes('danger')) {
+      return "Financial risk in football is critical to understand! Here's how I assess club sustainability:\n\n**Risk Factors:**\n🔴 **High Risk**: Wage ratio >100%, negative cash flow\n🟡 **Medium Risk**: Wage ratio 85-100%, tight cash flow\n🟢 **Low Risk**: Wage ratio <85%, positive cash flow\n\n**Position-Based Risk:**\n• **Positions 1-6**: Low risk (promotion potential)\n• **Positions 7-17**: Medium risk (mid-table uncertainty)\n• **Positions 18-24**: High risk (relegation threatens revenue)\n\n**Warning Signs:**\n⚠️ Monthly cash burn exceeding revenue\n⚠️ Wage costs above 90% of income\n⚠️ Less than 6 months operating cash\n\nWould you like me to analyze the risk profile for a specific league position?"
+    }
   }
 
   // Property search queries

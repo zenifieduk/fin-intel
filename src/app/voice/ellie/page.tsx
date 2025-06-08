@@ -4,11 +4,10 @@ import { useState, useCallback } from "react"
 import { useConversation } from '@elevenlabs/react';
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
-import { MessageCircle, Phone, Sparkles, Mic, PhoneOff, Loader2, ArrowLeft, Github } from "lucide-react"
-import { MobileMenu } from "@/components/ui/mobile-menu"
+import { MessageCircle, Phone, Sparkles, Mic, PhoneOff, Loader2, ArrowLeft } from "lucide-react"
 import { AaranTextChat } from "@/components/AaranTextChat"
 
-export default function AIPage() {
+export default function ElliePage() {
   const [showEllieInterface, setShowEllieInterface] = useState(false)
   const [showChatInterface, setShowChatInterface] = useState(false)
   const [hasRequestedMicPermission, setHasRequestedMicPermission] = useState(false);
@@ -54,7 +53,7 @@ export default function AIPage() {
       }
 
       await conversation.startSession({
-        agentId: 'x7sgGIFhnuZ1Joe6r2tT', // Correct Ellie Agent ID
+        agentId: 'x7sgGIFhnuZ1Joe6r2tT', // Ellie Agent ID from alan-batt project
       });
     } catch (error) {
       console.error('Failed to start conversation with Ellie:', error);
@@ -100,48 +99,15 @@ export default function AIPage() {
             <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
               <Sparkles className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold">Alan Batt Technology Hub</span>
+            <span className="text-xl font-bold">Fin-Intel Voice Assistant</span>
           </div>
           <div className="flex items-center space-x-6">
-            {/* Desktop Navigation - Hidden on mobile */}
-            <div className="hidden lg:flex items-center space-x-6">
-              <Button variant="ghost" asChild>
-                <Link href="/">Home</Link>
-              </Button>
-              <Button variant="ghost" asChild className="bg-blue-50 text-blue-600">
-                <Link href="/ai">AI</Link>
-              </Button>
-              <Button variant="ghost" asChild>
-                <Link href="/content">Content</Link>
-              </Button>
-              <Button variant="ghost" asChild>
-                <Link href="/new-dev">New Dev</Link>
-              </Button>
-              <Button variant="ghost" asChild>
-                <Link href="/reports">Reports</Link>
-              </Button>
-              <Button variant="ghost" asChild>
-                <Link href="/seo">SEO</Link>
-              </Button>
-              <Button variant="ghost" asChild>
-                <Link href="/markets">Markets</Link>
-              </Button>
-              <Button variant="ghost" asChild>
-                <Link href="/downloads">Downloads</Link>
-              </Button>
-              <Button variant="outline" size="sm" asChild>
-                <Link href="https://github.com/zenifieduk/alan-batt" target="_blank">
-                  <Github className="h-4 w-4 mr-2" />
-                  GitHub
-                </Link>
-              </Button>
-              <Button variant="outline" size="sm">
-                Contact
-              </Button>
-            </div>
-            
-            {/* Mobile Menu */}
-            <MobileMenu currentPage="ai" />
+            <Button variant="ghost" asChild>
+              <Link href="/voice">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Dashboard
+              </Link>
+            </Button>
           </div>
         </nav>
       </header>
@@ -152,9 +118,10 @@ export default function AIPage() {
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <AaranTextChat
-              agentId="x7sgGIFhnuZ1Joe6r2tT"
+              agentId="agent_01jx2dwz4yeke9dzh7bwjacdxh"
               onBack={handleBackToAI}
-              title="Chat with Ellie"
+              title="Chat with Aaran - Financial Assistant"
+              description="AI Financial Assistant for FRF7 Dashboard"
             />
           </div>
         </main>
@@ -165,28 +132,29 @@ export default function AIPage() {
             {/* Hero Section */}
             <div className="mb-16 text-left">
               <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6 text-slate-900">
-                Customer facing sales and customer services AI
+                Ellie - Financial Intelligence Assistant
               </h1>
               
               <p className="text-lg text-slate-600 mb-8 max-w-3xl">
-                Enhance your customer experience with our advanced AI agents. 
-                From voice booking to intelligent chat support, our AI solutions handle customer interactions naturally and efficiently.
+                Meet Ellie, your advanced AI financial assistant powered by ElevenLabs technology. 
+                She can help you understand complex financial data, provide insights on football club economics, 
+                and guide you through the FRF7 dashboard with natural conversation.
               </p>
             </div>
 
             {/* Demo Cards */}
             <div className="space-y-16">
-              {/* Ellie Section */}
+              {/* Ellie Voice Section */}
               <section className="space-y-8">
                 {/* Ellie Introduction */}
                 <div className="text-left max-w-4xl">
                   <h2 className="text-3xl font-bold text-slate-900 mb-4">
-                    1. Conversational AI - Ellie
+                    1. Voice Conversation with Ellie
                   </h2>
                   <p className="text-lg text-slate-600">
-                    Ellie is our advanced voice booking agent powered by ElevenLabs AI technology. 
-                    She can handle customer inquiries, check availability, create bookings, and manage client communications 
-                    with natural, human-like conversation.
+                    Ellie is our advanced voice assistant powered by ElevenLabs AI technology. 
+                    She can help you navigate financial data, explain league position impacts, 
+                    and provide insights about football club economics through natural conversation.
                   </p>
                 </div>
 
@@ -210,7 +178,7 @@ export default function AIPage() {
 
                           {/* Description */}
                           <p className="text-slate-600 mb-3">
-                            Voice booking agent powered by ElevenLabs AI
+                            Voice financial assistant powered by ElevenLabs AI
                           </p>
 
                           {/* Call to Action */}
@@ -253,7 +221,7 @@ export default function AIPage() {
                               </div>
                               <div className="text-left">
                                 <h3 className="font-semibold text-slate-900">Talk to Ellie</h3>
-                                <p className="text-sm text-slate-600">AI Sales Assistant</p>
+                                <p className="text-sm text-slate-600">AI Financial Assistant</p>
                               </div>
                             </div>
                           </div>
@@ -293,7 +261,7 @@ export default function AIPage() {
 
                             {!hasRequestedMicPermission && conversation.status === 'disconnected' && (
                               <div className="text-sm text-slate-600 text-center">
-                                <p className="mb-2">Hi! I&apos;m Ellie, your AI sales assistant.</p>
+                                <p className="mb-2">Hi! I&apos;m Ellie, your AI financial assistant.</p>
                                 <p>I&apos;ll need microphone access to chat with you!</p>
                               </div>
                             )}
@@ -362,109 +330,31 @@ export default function AIPage() {
                             </Button>
                           </div>
 
-                          {/* Lead Generation Note */}
+                          {/* Usage Note */}
                           <p className="text-xs text-slate-500 mt-4 text-center">
-                            Conversations help us understand your needs better
+                            Ask Ellie about league positions, financial implications, or dashboard navigation
                           </p>
                         </>
                       )}
                     </div>
                   </div>
                 </div>
-
-                {/* Ellie Tech Stack & Capabilities */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                  {/* Tech Stack */}
-                  <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30">
-                    <h4 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
-                      <Sparkles className="w-5 h-5 mr-2 text-blue-600" />
-                      Tech Stack
-                    </h4>
-                    <ul className="space-y-2 text-sm text-slate-700">
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-3" />
-                        n8n for workflow automation
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-purple-500 rounded-full mr-3" />
-                        ElevenLabs + ChatGPT 4.1
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3" />
-                        Google Calendar integration
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-orange-500 rounded-full mr-3" />
-                        Airtable database
-                      </li>
-                    </ul>
-                  </div>
-
-                  {/* Current Capabilities */}
-                  <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30">
-                    <h4 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
-                      <Phone className="w-5 h-5 mr-2 text-green-600" />
-                      Current Capabilities
-                    </h4>
-                    <ul className="space-y-2 text-sm text-slate-700">
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3" />
-                        Check availability & create bookings
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3" />
-                        Discuss available properties
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3" />
-                        Email client communication
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3" />
-                        Email Alan Batt directly
-                      </li>
-                    </ul>
-                  </div>
-
-                  {/* Planned Capabilities */}
-                  <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30">
-                    <h4 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
-                      <Sparkles className="w-5 h-5 mr-2 text-purple-600" />
-                      Planned Capabilities
-                    </h4>
-                    <ul className="space-y-2 text-sm text-slate-700">
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-purple-500 rounded-full mr-3" />
-                        Update existing bookings
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-purple-500 rounded-full mr-3" />
-                        Cancel bookings
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-gray-400 rounded-full mr-3" />
-                        More features coming soon...
-                      </li>
-                    </ul>
-                  </div>
-                </div>
               </section>
-
-              {/* Ellie Chatbot Section */}
+              {/* Ellie Text Chat Section */}
               <section className="space-y-8">
-                {/* Ellie Chatbot Introduction */}
+                {/* Ellie Text Chat Introduction */}
                 <div className="text-left max-w-4xl">
                   <h2 className="text-3xl font-bold text-slate-900 mb-4">
-                    2. Alan Batt Chatbot Development - Ellie Chatbot
+                    2. Text Chat with Ellie
                   </h2>
                   <p className="text-lg text-slate-600">
-                    Ellie Chatbot represents our advanced text-based conversational AI development capabilities. 
-                    Designed for Alan Batt&apos;s client services, it demonstrates sophisticated natural language processing 
-                    and intelligent response generation for business applications.
+                    Prefer typing? Chat with Ellie through our text interface. 
+                    She provides the same intelligent financial assistance through written conversation, 
+                    perfect for detailed discussions about complex financial data.
                   </p>
                 </div>
 
-                {/* Ellie Chatbot Demo Card - Centered */}
+                {/* Ellie Text Chat Demo Card - Centered */}
                 <div className="flex justify-center">
                   <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-8 hover:shadow-xl transition-all duration-300 w-full max-w-md">
                     <div className="flex flex-col items-center text-center">
@@ -475,23 +365,23 @@ export default function AIPage() {
 
                       {/* Title */}
                       <h3 className="text-2xl font-bold text-slate-900 mb-4">
-                        Ellie Chatbot
+                        Chat with Ellie
                       </h3>
 
                       {/* Description */}
                       <p className="text-slate-600 mb-3">
-                        Advanced text-based AI assistant
+                        Advanced text-based financial assistant
                       </p>
 
                       {/* Status Indicator */}
                       <div className="flex items-center justify-center space-x-2 mb-4">
-                        <div className="w-2 h-2 bg-amber-500 rounded-full" />
-                        <span className="text-sm font-medium text-amber-700">Status: Training</span>
+                        <div className="w-2 h-2 bg-green-500 rounded-full" />
+                        <span className="text-sm font-medium text-green-700">Status: Ready</span>
                       </div>
 
                       {/* Additional Info */}
                       <p className="text-slate-700 font-medium mb-8">
-                        Experience intelligent conversation powered by ElevenLabs
+                        Experience intelligent conversation about financial data
                       </p>
 
                       {/* Button */}
@@ -506,21 +396,97 @@ export default function AIPage() {
                       
                       {/* Technology Note */}
                       <p className="text-xs text-slate-500 mt-4">
-                        Same knowledge base as voice Ellie
+                        Same AI knowledge base as voice Ellie
                       </p>
                     </div>
                   </div>
                 </div>
               </section>
-            </div>
+
+              {/* Tech Stack & Capabilities */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                {/* Tech Stack */}
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30">
+                  <h4 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                    <Sparkles className="w-5 h-5 mr-2 text-blue-600" />
+                    Tech Stack
+                  </h4>
+                  <ul className="space-y-2 text-sm text-slate-700">
+                    <li className="flex items-center">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3" />
+                      ElevenLabs + ChatGPT 4.1
+                    </li>
+                    <li className="flex items-center">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full mr-3" />
+                      React + Next.js integration
+                    </li>
+                    <li className="flex items-center">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-3" />
+                      Real-time voice processing
+                    </li>
+                    <li className="flex items-center">
+                      <div className="w-2 h-2 bg-orange-500 rounded-full mr-3" />
+                      Financial data analysis
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Current Capabilities */}
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30">
+                  <h4 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                    <Phone className="w-5 h-5 mr-2 text-green-600" />
+                    Current Capabilities
+                  </h4>
+                  <ul className="space-y-2 text-sm text-slate-700">
+                    <li className="flex items-center">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-3" />
+                      Financial data interpretation
+                    </li>
+                    <li className="flex items-center">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-3" />
+                      League position analysis
+                    </li>
+                    <li className="flex items-center">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-3" />
+                      Dashboard navigation help
+                    </li>
+                    <li className="flex items-center">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-3" />
+                      Natural conversation flow
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Planned Capabilities */}
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-white/30">
+                  <h4 className="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                    <Sparkles className="w-5 h-5 mr-2 text-purple-600" />
+                    Planned Capabilities
+                  </h4>
+                  <ul className="space-y-2 text-sm text-slate-700">
+                    <li className="flex items-center">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full mr-3" />
+                      Predictive analytics
+                    </li>
+                    <li className="flex items-center">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full mr-3" />
+                      Custom report generation
+                    </li>
+                    <li className="flex items-center">
+                      <div className="w-2 h-2 bg-gray-400 rounded-full mr-3" />
+                      Integration with live data
+                    </li>
+                  </ul>
+                </div>
+              </div>
 
             {/* Live Demo Note */}
             <div className="mt-12 p-6 bg-white/60 backdrop-blur-sm rounded-xl border border-white/30 max-w-3xl mx-auto">
               <div className="flex items-center justify-center space-x-2 text-slate-700">
                 <Sparkles className="w-5 h-5 text-purple-600" />
                 <span className="font-medium">
-                  Live Demo: Both voice and text interfaces use ElevenLabs AI technology and share the same knowledge base. 
-                  Experience natural conversation about Alan Batt&apos;s property services!
+                  Live Demo: Both voice and text interfaces use ElevenLabs AI technology. 
+                  Experience natural conversation about football club financial intelligence!
                 </span>
               </div>
             </div>
@@ -543,7 +509,7 @@ export default function AIPage() {
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-2">Intelligent Chat</h3>
                 <p className="text-slate-600">
-                  Context-aware responses tailored to your specific needs
+                  Context-aware responses tailored to financial data analysis
                 </p>
               </div>
 
@@ -551,11 +517,12 @@ export default function AIPage() {
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                   <Sparkles className="w-6 h-6 text-purple-600" />
                 </div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">Real-time</h3>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">Financial Expert</h3>
                 <p className="text-slate-600">
-                  Instant responses with advanced AI understanding
+                  Specialized in football club economics and league position analysis
                 </p>
               </div>
+            </div>
             </div>
           </div>
         </main>
@@ -563,8 +530,8 @@ export default function AIPage() {
 
       {/* Footer */}
       <footer className="container mx-auto px-4 py-8 text-center text-slate-500">
-        <p>&copy; 2024 Alan Batt. Experience the future of AI conversation.</p>
+        <p>&copy; 2024 Fin-Intel. Experience the future of AI-powered financial conversation.</p>
       </footer>
     </div>
   )
-} 
+}

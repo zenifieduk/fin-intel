@@ -18,7 +18,7 @@ interface EllieTextChatProps {
   description?: string
 }
 
-export function EllieTextChat({ 
+export function AaranTextChat({ 
   agentId, 
   onBack, 
   title = "Chat with Ellie", 
@@ -45,14 +45,16 @@ export function EllieTextChat({
     if (!isInitialized) {
       const welcomeMessage: Message = {
         id: 'welcome-message',
-        content: "Hello! I'm Ellie, your AI assistant. I can help you with property inquiries, bookings, and general questions about Alan Batt's services. How can I assist you today?",
+        content: title.includes('Financial') 
+          ? "Hello! I'm Ellie, your AI financial assistant. I can help you understand football club economics, explain league position impacts, navigate the FRF7 dashboard, and analyze financial data. What would you like to explore today?"
+          : "Hello! I'm Ellie, your AI assistant. I can help you with property inquiries, bookings, and general questions about Alan Batt's services. How can I assist you today?",
         sender: 'agent',
         timestamp: new Date()
       }
       setMessages([welcomeMessage])
       setIsInitialized(true)
     }
-  }, [isInitialized])
+  }, [isInitialized, title])
 
   const sendMessage = async () => {
     if (!inputValue.trim() || isLoading) return
