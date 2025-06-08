@@ -495,7 +495,10 @@ const EFL_LIQUIDITY_ANALYZER = () => {
         {/* Controls */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-            <label className="block text-sm font-medium mb-2">League Position</label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium">League Position</label>
+              <span className="text-sm font-bold text-cyan-400">Position: {selectedPosition}</span>
+            </div>
             <input
               type="range"
               min="1"
@@ -506,7 +509,6 @@ const EFL_LIQUIDITY_ANALYZER = () => {
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
               <span>1st (Champions)</span>
-              <span className="font-bold text-white">Position: {selectedPosition}</span>
               <span>24th (Relegated)</span>
             </div>
           </div>
@@ -527,7 +529,7 @@ const EFL_LIQUIDITY_ANALYZER = () => {
             >
               {Object.entries(scenarios).map(([key, data]) => (
                 <option key={key} value={key}>
-                  {data.name} (Pos {data.position})
+                  {data.name}
                 </option>
               ))}
             </select>
