@@ -581,6 +581,9 @@ const EFL_LIQUIDITY_ANALYZER = () => {
             <a href="/frf7" className="text-blue-400 font-medium hover:text-blue-300 transition-colors">
               FRF7 Voice Control
             </a>
+            <a href="/voice" className="text-white/70 hover:text-white transition-colors">
+              Aaran
+            </a>
           </nav>
         </div>
       </div>
