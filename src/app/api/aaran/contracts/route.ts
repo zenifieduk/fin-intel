@@ -5,6 +5,26 @@ interface ToolCallRequest {
   query: string
 }
 
+interface PlayerContract {
+  player_name: string
+  position?: string
+  start_date: string
+  end_date: string
+  base_weekly_wage?: number
+  bonuses?: {
+    signing_bonus?: number
+    goal_bonus?: number
+    clean_sheet_bonus?: number
+    appearance_bonus?: number
+  }
+}
+
+interface WageBillSummary {
+  totalWeekly: number | null
+  totalAnnual: number | null
+  playerCount: number
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body: ToolCallRequest = await request.json()
@@ -54,7 +74,7 @@ async function processContractQuery(query: string): Promise<string> {
           return "No players have contracts expiring in 2025. All current Manchester United contracts extend beyond 2025."
         }
         
-        const playerList = expiring.map((p: any) => {
+        const playerList = expiring.map((p: PlayerContract) => {
           const expiryDate = new Date(p.end_date).toLocaleDateString('en-GB')
           return `${p.player_name} (expires ${expiryDate})`
         }).join(', ')
@@ -68,7 +88,7 @@ async function processContractQuery(query: string): Promise<string> {
           return "No players have contracts expiring in 2026."
         }
         
-        const playerList = expiring.map((p: any) => {
+        const playerList = expiring.map((p: PlayerContract) => {
           const expiryDate = new Date(p.end_date).toLocaleDateString('en-GB')
           return `${p.player_name} (expires ${expiryDate})`
         }).join(', ')
@@ -82,7 +102,7 @@ async function processContractQuery(query: string): Promise<string> {
         return "No contracts expiring in the near future."
       }
       
-      const contractSummary = expiringContracts.map((p: any) => {
+      const contractSummary = expiringContracts.map((p: PlayerContract) => {
         const expiryDate = new Date(p.end_date).toLocaleDateString('en-GB')
         return `${p.player_name} (contract until ${expiryDate})`
       }).join(', ')
@@ -102,7 +122,7 @@ async function processContractQuery(query: string): Promise<string> {
 
       if (lowerQuery.includes('highest') || lowerQuery.includes('top') || lowerQuery.includes('most expensive')) {
         const highestEarners = await ContractQueries.getHighestPaidPlayers(5)
-        const earnersList = highestEarners.map((p: any) => {
+        const earnersList = highestEarners.map((p: PlayerContract) => {
           const weekly = p.base_weekly_wage ? `£${Number(p.base_weekly_wage).toLocaleString()}/week` : 'Wage not disclosed'
           return `${p.player_name} (${weekly})`
         }).join(', ')
@@ -136,8 +156,8 @@ async function processContractQuery(query: string): Promise<string> {
       
       // Add bonus information if available
       if (player.bonuses && typeof player.bonuses === 'object') {
-        const bonuses = player.bonuses as any
-        const bonusInfo = []
+        const bonuses = player.bonuses
+        const bonusInfo: string[] = []
         if (bonuses.signing_bonus) bonusInfo.push(`Signing bonus: £${Number(bonuses.signing_bonus).toLocaleString()}`)
         if (bonuses.goal_bonus) bonusInfo.push(`Goal bonus: £${Number(bonuses.goal_bonus).toLocaleString()} per goal`)
         if (bonuses.clean_sheet_bonus) bonusInfo.push(`Clean sheet bonus: £${Number(bonuses.clean_sheet_bonus).toLocaleString()}`)
@@ -167,7 +187,7 @@ async function processContractQuery(query: string): Promise<string> {
     if (naturalResult && Array.isArray(naturalResult) && naturalResult.length > 0) {
       if (typeof naturalResult[0] === 'object' && 'player_name' in naturalResult[0]) {
         // Format player results
-        const playerSummary = naturalResult.map((p: any) => `${p.player_name} (${p.position})`).join(', ')
+        const playerSummary = naturalResult.map((p: PlayerContract) => `${p.player_name} (${p.position || 'Unknown position'})`).join(', ')
         return `Found ${naturalResult.length} result(s): ${playerSummary}.`
       }
     }
