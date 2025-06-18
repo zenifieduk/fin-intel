@@ -216,7 +216,7 @@ const ArchitecturePage = () => {
                 <h4 className="font-semibold text-purple-200 mb-2">ElevenLabs Voice Synthesis</h4>
                 <p className="text-sm text-gray-300">
                   Advanced voice AI handling speech-to-text conversion and 
-                  natural language responses with "Aaran" voice assistant.
+                  natural language responses with &quot;Aaran&quot; voice assistant.
                 </p>
               </div>
             </div>

@@ -277,7 +277,7 @@ const PREMIER_LEAGUE_CONTRACTS = () => {
           </h3>
           <p className="text-blue-200 mb-6 max-w-2xl mx-auto">
             Get instant insights about Manchester United contracts, wage structures, expiry dates, and transfer implications.
-            Ask questions like "Which players are out of contract this year?" or "What's our total wage bill?"
+            Ask questions like &quot;Which players are out of contract this year?&quot; or &quot;What&apos;s our total wage bill?&quot;
           </p>
           <button
             className={`px-8 py-4 rounded-lg font-semibold transition-all duration-200 hover:scale-105 ${
