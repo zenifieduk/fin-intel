@@ -75,7 +75,7 @@ export const contractFunctions = {
           success: true,
           query: args.query,
           results: results,
-          count: results.length,
+          count: Array.isArray(results) ? results.length : (results?.playerCount || 1),
           timestamp: new Date().toISOString()
         }
       }
