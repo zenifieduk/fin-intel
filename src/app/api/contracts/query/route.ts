@@ -15,12 +15,15 @@ export async function POST(request: NextRequest) {
     // Process the natural language query
     const results = await ContractQueries.processNaturalLanguageQuery(query)
     
+    // Handle different result types (arrays vs objects)
+    const count = Array.isArray(results) ? results.length : 1
+    
     // Format response for AARAN
     return NextResponse.json({
       success: true,
       query: query,
       results: results,
-      count: results.length,
+      count: count,
       timestamp: new Date().toISOString()
     })
     
