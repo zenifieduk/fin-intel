@@ -17,16 +17,20 @@ export class ContractQueries {
       return []
     }
     
-    const { data, error } = await supabase.rpc('get_players_expiring', { 
-      target_year: year 
-    })
+    // Use the existing view to find contracts expiring in the specified year
+    const { data, error } = await supabase
+      .from('active_contracts_view')
+      .select('*')
+      .gte('end_date', `${year}-01-01`)
+      .lt('end_date', `${year + 1}-01-01`)
+      .order('end_date', { ascending: true })
     
     if (error) {
       console.error('Error fetching expiring contracts:', error)
       return []
     }
     
-    return data
+    return data || []
   }
 
   // Players with contracts expiring soon (within days)
