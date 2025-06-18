@@ -1,9 +1,22 @@
-import { supabase } from './supabase'
+import { supabase, isSupabaseConfigured } from './supabase'
 
 export class ContractQueries {
   
+  // Helper method to check configuration before database operations
+  private static checkConfiguration() {
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase not properly configured - using fallback response')
+      return false
+    }
+    return true
+  }
+  
   // Players out of contract in a specific year
   static async getPlayersOutOfContract(year: number = new Date().getFullYear()) {
+    if (!this.checkConfiguration()) {
+      return []
+    }
+    
     const { data, error } = await supabase.rpc('get_players_expiring', { 
       target_year: year 
     })
@@ -18,6 +31,10 @@ export class ContractQueries {
 
   // Players with contracts expiring soon (within days)
   static async getContractsExpiringSoon(days: number = 365) {
+    if (!this.checkConfiguration()) {
+      return []
+    }
+    
     const { data, error } = await supabase
       .from('active_contracts_view')
       .select('*')
@@ -35,6 +52,10 @@ export class ContractQueries {
 
   // Get total wage bill for a club
   static async getClubWageBill(clubName: string = 'Manchester United') {
+    if (!this.checkConfiguration()) {
+      return { totalWeekly: 0, totalAnnual: 0, playerCount: 0 }
+    }
+    
     const { data, error } = await supabase
       .from('active_contracts_view')
       .select('base_weekly_wage')
@@ -57,6 +78,10 @@ export class ContractQueries {
 
   // Get players by position
   static async getPlayersByPosition(position: string) {
+    if (!this.checkConfiguration()) {
+      return []
+    }
+    
     const { data, error } = await supabase
       .from('active_contracts_view')
       .select('*')
@@ -73,6 +98,10 @@ export class ContractQueries {
 
   // Search players by name
   static async searchPlayers(searchTerm: string) {
+    if (!this.checkConfiguration()) {
+      return []
+    }
+    
     const { data, error } = await supabase
       .from('active_contracts_view')
       .select('*')
@@ -88,6 +117,10 @@ export class ContractQueries {
 
   // Get highest paid players
   static async getHighestPaidPlayers(limit: number = 10) {
+    if (!this.checkConfiguration()) {
+      return []
+    }
+    
     const { data, error } = await supabase
       .from('active_contracts_view')
       .select('*')
@@ -104,6 +137,10 @@ export class ContractQueries {
 
   // Get players with specific bonus types
   static async getPlayersWithBonuses(bonusType?: string) {
+    if (!this.checkConfiguration()) {
+      return []
+    }
+    
     const { data, error } = await supabase
       .from('active_contracts_view')
       .select('*')
@@ -119,6 +156,10 @@ export class ContractQueries {
 
   // Natural language query processor
   static async processNaturalLanguageQuery(query: string) {
+    if (!this.checkConfiguration()) {
+      return []
+    }
+    
     const lowerQuery = query.toLowerCase()
     
     // Contract expiry queries
@@ -170,6 +211,10 @@ export class ContractQueries {
 
   // Get all active contracts
   static async getAllActiveContracts() {
+    if (!this.checkConfiguration()) {
+      return []
+    }
+    
     const { data, error } = await supabase
       .from('active_contracts_view')
       .select('*')

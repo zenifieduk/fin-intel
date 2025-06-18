@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ContractQueries } from '@/lib/contract-queries'
+import { isSupabaseConfigured } from '@/lib/supabase'
 
 interface ToolCallRequest {
   query: string
@@ -64,6 +65,17 @@ export async function POST(request: NextRequest) {
 
 async function processContractQuery(query: string): Promise<string> {
   const lowerQuery = query.toLowerCase()
+
+  // Check if Supabase is properly configured
+  if (!isSupabaseConfigured()) {
+    return `I'm currently unable to access the contract database due to missing configuration. Please ensure the following environment variables are set:
+    
+• NEXT_PUBLIC_SUPABASE_URL
+• NEXT_PUBLIC_SUPABASE_ANON_KEY  
+• SUPABASE_SERVICE_ROLE_KEY
+
+Once configured, I'll be able to provide Manchester United contract information including player details, wage bills, and contract expiry dates.`
+  }
 
   try {
     // Contract expiry queries
