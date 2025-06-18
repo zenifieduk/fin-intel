@@ -143,6 +143,50 @@ Once configured, I'll be able to provide Manchester United contract information 
       }
     }
 
+    // Temporal wage queries (enhanced for future wage predictions)
+    const yearMatch = query.match(/\b(20\d{2})\b/)
+    if (yearMatch && (lowerQuery.includes('earn') || lowerQuery.includes('wage') || lowerQuery.includes('salary'))) {
+      const targetYear = yearMatch[1]
+      const playerNames = ['diogo dalot', 'dalot', 'andré onana', 'onana', 'kobbie mainoo', 'mainoo']
+      const foundPlayer = playerNames.find(name => lowerQuery.includes(name))
+      
+      if (foundPlayer) {
+        let searchName = foundPlayer
+        if (foundPlayer.includes('dalot')) searchName = 'dalot'
+        if (foundPlayer.includes('onana')) searchName = 'onana'
+        if (foundPlayer.includes('mainoo')) searchName = 'mainoo'
+        
+        const playerDetails = await ContractQueries.searchPlayers(searchName)
+        if (playerDetails.length === 0) {
+          return `No contract details found for ${foundPlayer}.`
+        }
+
+        const player = playerDetails[0]
+        
+        // Check if player has contract during target year
+        const contractStart = new Date(player.start_date).getFullYear()
+        const contractEnd = new Date(player.end_date).getFullYear()
+        const queryYear = parseInt(targetYear)
+        
+        if (queryYear < contractStart || queryYear > contractEnd) {
+          return `${player.player_name} does not have a contract in ${targetYear}. Contract period: ${contractStart}-${contractEnd}.`
+        }
+        
+        // Parse wage progressions for target year
+        if (player.wage_progressions && typeof player.wage_progressions === 'object') {
+          const progressions = player.wage_progressions as any
+          if (progressions.annual_increases && progressions.annual_increases[targetYear]) {
+            const futureWage = progressions.annual_increases[targetYear].weekly_wage
+            return `${player.player_name} will earn £${Number(futureWage).toLocaleString()}/week in ${targetYear} according to contractual wage progression.`
+          }
+        }
+        
+        // Fallback to base wage if no progression data
+        const weeklyWage = player.base_weekly_wage ? `£${Number(player.base_weekly_wage).toLocaleString()}` : 'Undisclosed'
+        return `${player.player_name} is contracted to earn ${weeklyWage}/week in ${targetYear} (base wage, no progression data available).`
+      }
+    }
+
     // Specific player queries
     const playerNames = ['diogo dalot', 'dalot', 'andré onana', 'onana', 'kobbie mainoo', 'mainoo']
     const foundPlayer = playerNames.find(name => lowerQuery.includes(name))
@@ -166,11 +210,27 @@ Once configured, I'll be able to provide Manchester United contract information 
       
       let response = `${player.player_name}: Contract from ${startDate} to ${endDate}, Weekly wage: ${weeklyWage}`
       
+      // Add wage progression information if available
+      if (player.wage_progressions && typeof player.wage_progressions === 'object') {
+        const progressions = player.wage_progressions as any
+        if (progressions.annual_increases) {
+          const futureWages: string[] = []
+          Object.entries(progressions.annual_increases).forEach(([year, data]: [string, any]) => {
+            if (data.weekly_wage && parseInt(year) > new Date().getFullYear()) {
+              futureWages.push(`${year}: £${Number(data.weekly_wage).toLocaleString()}/week`)
+            }
+          })
+          if (futureWages.length > 0) {
+            response += `. Future wage increases: ${futureWages.join(', ')}`
+          }
+        }
+      }
+      
       // Add bonus information if available
       if (player.bonuses && typeof player.bonuses === 'object') {
         const bonuses = player.bonuses
         const bonusInfo: string[] = []
-        if (bonuses.signing_bonus) bonusInfo.push(`Signing bonus: £${Number(bonuses.signing_bonus).toLocaleString()}`)
+        if (bonuses.signing_bonus) bonusInfo.push(`Signing bonus: £${Number(bonuses.signing_bonus.amount || bonuses.signing_bonus).toLocaleString()}`)
         if (bonuses.goal_bonus) bonusInfo.push(`Goal bonus: £${Number(bonuses.goal_bonus).toLocaleString()} per goal`)
         if (bonuses.clean_sheet_bonus) bonusInfo.push(`Clean sheet bonus: £${Number(bonuses.clean_sheet_bonus).toLocaleString()}`)
         if (bonuses.appearance_bonus) bonusInfo.push(`Appearance bonus: £${Number(bonuses.appearance_bonus).toLocaleString()} per game`)
