@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine, Area, AreaChart, ComposedChart } from 'recharts';
+import { Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine, Area, AreaChart, ComposedChart } from 'recharts';
 import { TrendingUp, AlertTriangle, Target, DollarSign } from 'lucide-react';
 
 interface FinancialTimelineChartProps {
@@ -286,7 +286,7 @@ const FinancialTimelineChart: React.FC<FinancialTimelineChartProps> = ({ highlig
       {!highlightedPlayer && (
         <div className="mt-4 text-center">
           <p className="text-slate-400 text-sm">
-            💡 <strong>Tip:</strong> Ask NICO to "highlight" a player to see their detailed financial timeline and risk analysis
+            💡 <strong>Tip:</strong> Ask NICO to &quot;highlight&quot; a player to see their detailed financial timeline and risk analysis
           </p>
         </div>
       )}
