@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { 
   TrendingUp, PoundSterling, Users, Clock, Shield, 
   AlertTriangle, Calendar, Target, Mic, MicOff, 
@@ -12,6 +12,54 @@ const PREMIER_LEAGUE_CONTRACTS = () => {
   // Contract Agent State
   const [hasRequestedMicPermission, setHasRequestedMicPermission] = useState(false);
   const [micPermissionGranted, setMicPermissionGranted] = useState<boolean | null>(null);
+  
+  // Player highlighting state for NICO
+  const [highlightedPlayer, setHighlightedPlayer] = useState<string | null>(null);
+  const [nicoActionFeedback, setNicoActionFeedback] = useState<string | null>(null);
+  
+  // Poll for NICO voice control commands
+  useEffect(() => {
+    let lastKnownUpdate = Date.now();
+    
+    const pollForNicoCommands = async () => {
+      try {
+        const response = await fetch('/api/voice-control', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          const state = result.data;
+          
+          // Only update if there's been a change
+          if (state.lastUpdate > lastKnownUpdate) {
+            lastKnownUpdate = state.lastUpdate;
+            
+            console.log('🎮 NICO Command Received (Contracts):', state);
+            
+            // Update highlighted player if changed
+            if (state.highlightedPlayer !== highlightedPlayer) {
+              setHighlightedPlayer(state.highlightedPlayer);
+              if (state.highlightedPlayer) {
+                setNicoActionFeedback(`🎤 NICO highlighted ${state.highlightedPlayer}`);
+              } else {
+                setNicoActionFeedback(`🎤 NICO cleared player highlight`);
+              }
+              setTimeout(() => setNicoActionFeedback(null), 3000);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error polling for NICO commands:', error);
+      }
+    };
+    
+    // Poll every 5 seconds for NICO commands
+    const interval = setInterval(pollForNicoCommands, 5000);
+    
+    return () => clearInterval(interval);
+  }, [highlightedPlayer]);
 
   // Sample contract data (will be replaced by real database queries)
   const contractStats = {
@@ -129,6 +177,20 @@ const PREMIER_LEAGUE_CONTRACTS = () => {
     }
   };
 
+  // Helper function to check if a player should be highlighted
+  const isPlayerHighlighted = (playerName: string) => {
+    if (!highlightedPlayer) return false;
+    
+    // Fuzzy matching for player names (case insensitive, partial matches)
+    const normalizedHighlight = highlightedPlayer.toLowerCase();
+    const normalizedPlayer = playerName.toLowerCase();
+    
+    return normalizedPlayer.includes(normalizedHighlight) || 
+           normalizedHighlight.includes(normalizedPlayer) ||
+           normalizedPlayer.split(' ').some(part => normalizedHighlight.includes(part)) ||
+           normalizedHighlight.split(' ').some(part => normalizedPlayer.includes(part));
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900">
       {/* Navigation */}
@@ -173,6 +235,15 @@ const PREMIER_LEAGUE_CONTRACTS = () => {
           <p className="text-xl text-blue-200 max-w-3xl mx-auto">
             Advanced contract analysis for Manchester United players with AI-powered insights
           </p>
+          
+          {/* NICO Action Feedback */}
+          {nicoActionFeedback && (
+            <div className="mt-4 mx-auto max-w-md">
+              <div className="bg-yellow-500/20 border border-yellow-400/40 rounded-lg p-3 text-yellow-100 text-sm backdrop-blur-sm">
+                {nicoActionFeedback}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Contract Overview Cards */}
@@ -227,24 +298,46 @@ const PREMIER_LEAGUE_CONTRACTS = () => {
               Urgent Contract Expirations
             </h3>
             <div className="space-y-4">
-              {upcomingExpirations.map((contract, index) => (
-                <div key={index} className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h4 className="font-semibold text-white">{contract.player}</h4>
-                      <p className="text-red-200 text-sm">{contract.position}</p>
+              {upcomingExpirations.map((contract, index) => {
+                const isHighlighted = isPlayerHighlighted(contract.player);
+                return (
+                  <div 
+                    key={index} 
+                    className={`rounded-lg p-4 transition-all duration-300 ${
+                      isHighlighted 
+                        ? 'bg-yellow-500/20 border-2 border-yellow-400 shadow-lg shadow-yellow-400/20 animate-pulse' 
+                        : 'bg-red-500/10 border border-red-500/20'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h4 className={`font-semibold ${isHighlighted ? 'text-yellow-100' : 'text-white'}`}>
+                          {contract.player}
+                          {isHighlighted && <span className="ml-2 text-yellow-400">⭐</span>}
+                        </h4>
+                        <p className={`text-sm ${isHighlighted ? 'text-yellow-200' : 'text-red-200'}`}>
+                          {contract.position}
+                        </p>
+                      </div>
+                      <span className={`text-white text-xs px-2 py-1 rounded ${
+                        isHighlighted ? 'bg-yellow-500' : 'bg-red-500'
+                      }`}>
+                        {contract.daysRemaining} days
+                      </span>
                     </div>
-                    <span className="bg-red-500 text-white text-xs px-2 py-1 rounded">
-                      {contract.daysRemaining} days
-                    </span>
+                    <div className="space-y-1 text-sm">
+                      <p className="text-blue-200">Current: {contract.currentWage}</p>
+                      <p className="text-blue-200">Expires: {contract.expiryDate}</p>
+                      <p className="text-yellow-200">Loyalty: {contract.loyaltyBonus}</p>
+                    </div>
+                    {isHighlighted && (
+                      <div className="mt-2 pt-2 border-t border-yellow-400/30">
+                        <p className="text-yellow-200 text-xs font-medium">🎤 Highlighted by NICO</p>
+                      </div>
+                    )}
                   </div>
-                  <div className="space-y-1 text-sm">
-                    <p className="text-blue-200">Current: {contract.currentWage}</p>
-                    <p className="text-blue-200">Expires: {contract.expiryDate}</p>
-                    <p className="text-yellow-200">Loyalty: {contract.loyaltyBonus}</p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -255,28 +348,49 @@ const PREMIER_LEAGUE_CONTRACTS = () => {
               Secure Contracts
             </h3>
             <div className="space-y-4">
-              {contractHighlights.map((contract, index) => (
-                <div key={index} className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h4 className="font-semibold text-white">{contract.player}</h4>
-                      <p className="text-green-200 text-sm">{contract.position}</p>
+              {contractHighlights.map((contract, index) => {
+                const isHighlighted = isPlayerHighlighted(contract.player);
+                return (
+                  <div 
+                    key={index} 
+                    className={`rounded-lg p-4 transition-all duration-300 ${
+                      isHighlighted 
+                        ? 'bg-yellow-500/20 border-2 border-yellow-400 shadow-lg shadow-yellow-400/20 animate-pulse' 
+                        : 'bg-green-500/10 border border-green-500/20'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h4 className={`font-semibold ${isHighlighted ? 'text-yellow-100' : 'text-white'}`}>
+                          {contract.player}
+                          {isHighlighted && <span className="ml-2 text-yellow-400">⭐</span>}
+                        </h4>
+                        <p className={`text-sm ${isHighlighted ? 'text-yellow-200' : 'text-green-200'}`}>
+                          {contract.position}
+                        </p>
+                      </div>
+                      <span className={`text-xs px-2 py-1 rounded ${
+                        isHighlighted ? 'bg-yellow-500 text-white' :
+                        contract.riskLevel === 'Low' ? 'bg-green-500 text-white' :
+                        contract.riskLevel === 'Medium' ? 'bg-yellow-500 text-white' :
+                        'bg-red-500 text-white'
+                      }`}>
+                        {contract.riskLevel} Risk
+                      </span>
                     </div>
-                    <span className={`text-xs px-2 py-1 rounded ${
-                      contract.riskLevel === 'Low' ? 'bg-green-500 text-white' :
-                      contract.riskLevel === 'Medium' ? 'bg-yellow-500 text-white' :
-                      'bg-red-500 text-white'
-                    }`}>
-                      {contract.riskLevel} Risk
-                    </span>
+                    <div className="space-y-1 text-sm">
+                      <p className="text-blue-200">Wage: {contract.currentWage}</p>
+                      <p className="text-blue-200">Until: {contract.contractEnd}</p>
+                      <p className="text-yellow-200">{contract.keyClause}</p>
+                    </div>
+                    {isHighlighted && (
+                      <div className="mt-2 pt-2 border-t border-yellow-400/30">
+                        <p className="text-yellow-200 text-xs font-medium">🎤 Highlighted by NICO</p>
+                      </div>
+                    )}
                   </div>
-                  <div className="space-y-1 text-sm">
-                    <p className="text-blue-200">Wage: {contract.currentWage}</p>
-                    <p className="text-blue-200">Until: {contract.contractEnd}</p>
-                    <p className="text-yellow-200">{contract.keyClause}</p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

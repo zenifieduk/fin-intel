@@ -31,6 +31,71 @@ const EFL_LIQUIDITY_ANALYZER = () => {
   useEffect(() => {
     currentScenarioRef.current = scenario;
   }, [scenario]);
+
+  // Poll for NICO voice control commands (silent DOM control) - CONTROLLED POLLING
+  const [nicoPollingEnabled, setNicoPollingEnabled] = useState(false);
+  const [highlightedPlayer, setHighlightedPlayer] = useState<string | null>(null);
+  
+  useEffect(() => {
+    if (!nicoPollingEnabled) return;
+    
+    let lastKnownUpdate = Date.now();
+    
+    const pollForNicoCommands = async () => {
+      try {
+        const response = await fetch('/api/voice-control', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          const state = result.data;
+          
+          // Only update if there's been a change
+          if (state.lastUpdate > lastKnownUpdate) {
+            lastKnownUpdate = state.lastUpdate;
+            
+            console.log('🎮 NICO Command Received:', state);
+            
+            // Update position if changed
+            if (state.position !== selectedPosition) {
+              setSelectedPosition(state.position);
+              currentPositionRef.current = state.position;
+              setAaranActionFeedback(`🎤 NICO moved to position ${state.position}`);
+              setTimeout(() => setAaranActionFeedback(null), 3000);
+            }
+            
+            // Update scenario if changed
+            if (state.scenario !== scenario) {
+              setScenario(state.scenario);
+              currentScenarioRef.current = state.scenario;
+              setAaranActionFeedback(`🎤 NICO set scenario to ${state.scenario}`);
+              setTimeout(() => setAaranActionFeedback(null), 3000);
+            }
+            
+            // Update highlighted player if changed
+            if (state.highlightedPlayer !== highlightedPlayer) {
+              setHighlightedPlayer(state.highlightedPlayer);
+              if (state.highlightedPlayer) {
+                setAaranActionFeedback(`🎤 NICO highlighted ${state.highlightedPlayer}`);
+              } else {
+                setAaranActionFeedback(`🎤 NICO cleared player highlight`);
+              }
+              setTimeout(() => setAaranActionFeedback(null), 3000);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error polling for NICO commands:', error);
+      }
+    };
+    
+    // Poll every 5 seconds for NICO commands (reduced frequency)
+    const interval = setInterval(pollForNicoCommands, 5000);
+    
+    return () => clearInterval(interval);
+  }, [selectedPosition, scenario, nicoPollingEnabled, highlightedPlayer]);
   
       // Aaran Assistant State - Simplified
   const [hasRequestedMicPermission, setHasRequestedMicPermission] = useState(false);
@@ -848,7 +913,19 @@ const EFL_LIQUIDITY_ANALYZER = () => {
             <a href="/contracts" className="text-white/70 hover:text-white transition-colors">
               Contracts (PL)
             </a>
-            <div className="ml-auto">
+            <div className="ml-auto flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setNicoPollingEnabled(!nicoPollingEnabled)}
+                  className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                    nicoPollingEnabled 
+                      ? 'bg-green-600 text-white' 
+                      : 'bg-gray-600 text-white/70 hover:bg-gray-500'
+                  }`}
+                >
+                  {nicoPollingEnabled ? '🎤 NICO ON' : '🎤 NICO OFF'}
+                </button>
+              </div>
               <button
                 className="text-slate-600 hover:text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition-colors flex items-center gap-2"
                 onClick={handleToggleAaran}

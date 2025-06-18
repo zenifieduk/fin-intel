@@ -17,7 +17,7 @@ interface NicoDOMControllerProps {
 export default function NicoDOMController({ onActionReceived }: NicoDOMControllerProps) {
   const router = useRouter()
   const [lastAction, setLastAction] = useState<DOMControlEvent | null>(null)
-  const [isListening, setIsListening] = useState(true)
+  const [isListening, setIsListening] = useState(false) // Default to OFF to stop terminal spam
 
   // Poll for DOM control commands from NICO
   useEffect(() => {
@@ -43,7 +43,7 @@ export default function NicoDOMController({ onActionReceived }: NicoDOMControlle
       }
     }
 
-    const interval = setInterval(pollForCommands, 1000) // Poll every second
+    const interval = setInterval(pollForCommands, 5000) // Poll every 5 seconds to reduce spam
     return () => clearInterval(interval)
   }, [isListening])
 
