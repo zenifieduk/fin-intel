@@ -843,7 +843,10 @@ const EFL_LIQUIDITY_ANALYZER = () => {
               FRF6 Intelligence
             </a>
             <a href="/voice" className="text-blue-400 font-medium hover:text-blue-300 transition-colors">
-              Aaran
+              Aaran (EFL)
+            </a>
+            <a href="/contracts" className="text-white/70 hover:text-white transition-colors">
+              Contracts (PL)
             </a>
             <div className="ml-auto">
               <button

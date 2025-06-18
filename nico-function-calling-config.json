@@ -1,0 +1,35 @@
+{
+  "functions": [
+    {
+      "name": "query_player_contracts",
+      "description": "Query the Manchester United player contract database to get detailed information about player wages, contract expiry dates, bonuses, and financial implications",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Natural language query about player contracts (e.g., 'Which players are out of contract this year?', 'Tell me about Onana's contract', 'What's our total wage bill?')"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "players-expiring-2025",
+              "players-expiring-2026", 
+              "all-contracts",
+              "highest-paid",
+              "total-wage-bill",
+              "specific-player"
+            ],
+            "description": "Specific action type for the query. Use 'players-expiring-2025' for current year expirations, 'specific-player' for individual player queries, 'total-wage-bill' for financial summaries, etc."
+          }
+        },
+        "required": ["query"]
+      }
+    }
+  ],
+  "function_call_url": "https://fin-intel.vercel.app/api/aaran/contracts",
+  "function_call_method": "POST",
+  "function_call_headers": {
+    "Content-Type": "application/json"
+  }
+} 
