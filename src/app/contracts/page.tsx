@@ -7,6 +7,7 @@ import {
   MessageCircle, Phone, PhoneOff, Loader2
 } from 'lucide-react';
 import { useConversation } from '@elevenlabs/react';
+import FinancialTimelineChart from '@/components/FinancialTimelineChart';
 
 const PREMIER_LEAGUE_CONTRACTS = () => {
   // Contract Agent State
@@ -394,6 +395,9 @@ const PREMIER_LEAGUE_CONTRACTS = () => {
             </div>
           </div>
         </div>
+
+        {/* Financial Timeline Chart */}
+        <FinancialTimelineChart highlightedPlayer={highlightedPlayer} />
 
         {/* AI Assistant Call-to-Action */}
         <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 backdrop-blur-sm rounded-xl p-8 border border-white/10 text-center">
