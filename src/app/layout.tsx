@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import NicoDOMController from "@/components/NicoDOMController";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,7 @@ export default function RootLayout({
         style={{ colorScheme: "light only" }}
       >
         {children}
+        <NicoDOMController />
       </body>
     </html>
   );
