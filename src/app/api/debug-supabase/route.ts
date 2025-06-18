@@ -3,10 +3,8 @@ import { ContractQueries } from '@/lib/contract-queries'
 
 export async function GET(request: NextRequest) {
   try {
-    const contractQueries = new ContractQueries()
-    
     // Test basic connection and table existence
-    const activeContracts = await contractQueries.getActiveContracts()
+    const activeContracts = await ContractQueries.getAllActiveContracts()
     
     return NextResponse.json({
       success: true,
