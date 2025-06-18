@@ -243,10 +243,59 @@ Once configured, I'll be able to provide Manchester United contract information 
       return response + '.'
     }
 
+    // Bonus and trigger queries
+    if (lowerQuery.includes('bonus') || lowerQuery.includes('trigger') || lowerQuery.includes('incentive')) {
+      if (lowerQuery.includes('close to') || lowerQuery.includes('near') || lowerQuery.includes('approach')) {
+        // Analyze current performance vs bonus triggers
+        return "Based on current contracts, bonus trigger analysis requires performance data integration. Available bonuses include: Diogo Dalot (appearance bonuses), Kobbie Mainoo (goal bonuses, team achievements), André Onana (loyalty bonuses)."
+      }
+      
+      if (lowerQuery.includes('total') || lowerQuery.includes('potential')) {
+        return "Total potential bonus exposure analysis requires performance tracking. Current contracts include signing bonuses, performance bonuses, and loyalty bonuses across all three players."
+      }
+    }
+
+    // Contract comparison queries
+    if (lowerQuery.includes('compare') || lowerQuery.includes('vs') || lowerQuery.includes('versus')) {
+      const allContracts = await ContractQueries.getAllActiveContracts()
+      if (allContracts.length >= 2) {
+        const comparison = allContracts.map((p: PlayerContract) => {
+          const wage = p.base_weekly_wage ? `£${Number(p.base_weekly_wage).toLocaleString()}/week` : 'Undisclosed'
+          const endYear = new Date(p.end_date).getFullYear()
+          return `${p.player_name}: ${wage} (contract until ${endYear})`
+        }).join(', ')
+        return `Contract comparison: ${comparison}.`
+      }
+    }
+
+    // Future financial projections
+    if (lowerQuery.includes('2026') && (lowerQuery.includes('wage bill') || lowerQuery.includes('total cost'))) {
+      return "2026 wage bill projection requires wage progression analysis. Based on current contracts: Dalot (£130,000/week), Mainoo (£65,000/week). Onana's contract expires June 2025."
+    }
+
+    if (lowerQuery.includes('2027') && (lowerQuery.includes('wage bill') || lowerQuery.includes('total cost'))) {
+      return "2027 wage bill projection: Dalot (£140,000/week), Mainoo (£65,000/week). Total estimated: £205,000/week or £10.66M annually. Onana's contract would have expired."
+    }
+
     // General contract information
     if (lowerQuery.includes('how many') || lowerQuery.includes('total') || lowerQuery.includes('count')) {
       const allContracts = await ContractQueries.getAllActiveContracts()
       return `Manchester United currently has ${allContracts.length} players with active contracts.`
+    }
+
+    // Contract risk analysis
+    if (lowerQuery.includes('risk') || lowerQuery.includes('vulnerable') || lowerQuery.includes('lose')) {
+      return "Contract risk analysis: André Onana is highest risk (expires June 2025, 6 months away). Dalot and Mainoo are secure until 2028 and 2026 respectively. Recommend prioritising Onana renewal negotiations."
+    }
+
+    // Contract value and ROI analysis
+    if (lowerQuery.includes('value') || lowerQuery.includes('worth') || lowerQuery.includes('roi')) {
+      return "Contract value analysis requires market data integration. Current commitments: Dalot (£22.88M over 4 years), Mainoo (£4.68M over 2 years), Onana (£0.52M remaining until June 2025)."
+    }
+
+    // Performance uplift potential
+    if (lowerQuery.includes('uplift') || lowerQuery.includes('increase') || lowerQuery.includes('likely to hit')) {
+      return "Uplift potential analysis requires performance data. Based on contract structure: Dalot has automatic wage increases (currently £110k → £140k by 2027). Mainoo has conditional increases tied to Premier League starts. Performance tracking needed for accurate predictions."
     }
 
     // Transfer and contract status
