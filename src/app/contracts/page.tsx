@@ -87,17 +87,29 @@ const PREMIER_LEAGUE_CONTRACTS = () => {
 
   const startConversationWithAgent = useCallback(async () => {
     try {
+      console.log('🎙️ Starting conversation with NICO...');
+      
       if (!hasRequestedMicPermission) {
+        console.log('🎤 Requesting microphone permission...');
         const granted = await requestMicrophonePermission();
-        if (!granted) return;
+        if (!granted) {
+          console.log('❌ Microphone permission denied');
+          return;
+        }
+        console.log('✅ Microphone permission granted');
       }
+      
+      console.log('🤖 Starting session with agent: agent_01jy1j8n36ee5rp8t5tv0p2nk7');
       
       // NICO - Premier League Contract Expert
       await conversation.startSession({
-        agentId: 'agent_01jy1j8n36ee5rp8t5tv0p2nk7', // NICO Agent ID
+        agentId: 'agent_01jy1j8n36ee5rp8t5tv0p2nk7', // NICO Agent ID (confirmed to exist)
       });
+      
+      console.log('✅ NICO conversation started successfully');
     } catch (error) {
-      console.error('Failed to start conversation:', error);
+      console.error('❌ Failed to start conversation with NICO:', error);
+      console.error('Error details:', JSON.stringify(error, null, 2));
     }
   }, [conversation, hasRequestedMicPermission, requestMicrophonePermission]);
 
