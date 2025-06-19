@@ -31,7 +31,7 @@ const EFL_LIQUIDITY_ANALYZER = () => {
   useEffect(() => {
     currentScenarioRef.current = scenario;
   }, [scenario]);
-
+  
   // Poll for NICO voice control commands (silent DOM control) - CONTROLLED POLLING
   const [nicoPollingEnabled, setNicoPollingEnabled] = useState(false);
   const [highlightedPlayer, setHighlightedPlayer] = useState<string | null>(null);

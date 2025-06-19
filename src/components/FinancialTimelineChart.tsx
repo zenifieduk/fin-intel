@@ -36,15 +36,13 @@ const contractData = {
   },
   'Kobbie Mainoo': {
     wages: [
-      { year: '2024/25', baseWage: 35, status: 'current' },
-      { year: '2025/26', baseWage: 50, status: 'upcoming' },
-      { year: '2026/27', baseWage: 75, status: 'future' },
-      { year: '2027/28', baseWage: 100, status: 'future' },
+      { year: '2024/25', baseWage: 45, status: 'current' },
+      { year: '2025/26', baseWage: 65, status: 'expires' },
     ],
     riskFactors: {
-      loyaltyBonus: 1,
-      totalExposure: 15.5,
-      nextMajorPayment: '2025-07-01'
+      loyaltyBonus: 0.3,
+      totalExposure: 5.7,
+      nextMajorPayment: '2026-06-30'
     }
   }
 };
