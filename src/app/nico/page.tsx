@@ -277,7 +277,7 @@ const NICO_MANCHESTER_UNITED_DASHBOARD = () => {
             NICO • Manchester United Season Forecasting
           </h1>
           <p className="text-xl text-blue-200 max-w-4xl mx-auto">
-            Advanced AI-powered analysis of Manchester United's 2025/26 Premier League campaign
+            Advanced AI-powered analysis of Manchester United&apos;s 2025/26 Premier League campaign
           </p>
           
           {/* NICO Action Feedback */}
