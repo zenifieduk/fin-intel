@@ -78,7 +78,7 @@ const PREMIER_LEAGUE_CONTRACTS = () => {
       position: "Goalkeeper", 
       currentWage: "£10k/week",
       expiryDate: "30 June 2025",
-      daysRemaining: 157,
+      daysRemaining: 11,
       loyaltyBonus: "£20M",
       status: "Critical"
     }
@@ -290,106 +290,141 @@ const PREMIER_LEAGUE_CONTRACTS = () => {
           </div>
         </div>
 
-        {/* Contract Details Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Urgent Expirations */}
+        {/* Contract Details - Compact Table Format */}
+        <div className="space-y-6 mb-8">
+          {/* Urgent Contract Expirations - Top Priority */}
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
             <h3 className="text-xl font-bold text-white mb-4 flex items-center">
               <AlertTriangle className="h-5 w-5 text-red-400 mr-2" />
               Urgent Contract Expirations
             </h3>
-            <div className="space-y-4">
+            <div className="space-y-2">
               {upcomingExpirations.map((contract, index) => {
                 const isHighlighted = isPlayerHighlighted(contract.player);
                 return (
                   <div 
                     key={index} 
-                    className={`rounded-lg p-4 transition-all duration-300 ${
+                    className={`flex items-center justify-between p-3 rounded-lg transition-all duration-300 ${
                       isHighlighted 
-                        ? 'bg-yellow-500/20 border-2 border-yellow-400 shadow-lg shadow-yellow-400/20 animate-pulse' 
-                        : 'bg-red-500/10 border border-red-500/20'
+                        ? 'bg-yellow-500/20 border border-yellow-400 shadow-lg shadow-yellow-400/20 animate-pulse' 
+                        : 'bg-red-500/10 border border-red-500/20 hover:bg-red-500/15'
                     }`}
                   >
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className="flex items-center gap-2">
                         <h4 className={`font-semibold ${isHighlighted ? 'text-yellow-100' : 'text-white'}`}>
                           {contract.player}
-                          {isHighlighted && <span className="ml-2 text-yellow-400">⭐</span>}
+                          {isHighlighted && <span className="text-yellow-400">⭐</span>}
                         </h4>
-                        <p className={`text-sm ${isHighlighted ? 'text-yellow-200' : 'text-red-200'}`}>
-                          {contract.position}
-                        </p>
-                    </div>
-                      <span className={`text-white text-xs px-2 py-1 rounded ${
-                        isHighlighted ? 'bg-yellow-500' : 'bg-red-500'
-                      }`}>
-                      {contract.daysRemaining} days
-                    </span>
-                  </div>
-                  <div className="space-y-1 text-sm">
-                    <p className="text-blue-200">Current: {contract.currentWage}</p>
-                    <p className="text-blue-200">Expires: {contract.expiryDate}</p>
-                    <p className="text-yellow-200">Loyalty: {contract.loyaltyBonus}</p>
-                  </div>
-                    {isHighlighted && (
-                      <div className="mt-2 pt-2 border-t border-yellow-400/30">
-                        <p className="text-yellow-200 text-xs font-medium">🎤 Highlighted by NICO</p>
+                        <span className="text-xs text-gray-300">{contract.position}</span>
                       </div>
-                    )}
-                </div>
+                      <span className="text-sm text-blue-200">{contract.currentWage}</span>
+                      <span className="text-sm text-blue-200">{contract.expiryDate}</span>
+                      <span className="text-sm text-yellow-200">{contract.loyaltyBonus}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs px-2 py-1 rounded font-medium ${
+                        isHighlighted ? 'bg-yellow-500 text-white' : 'bg-red-500 text-white'
+                      }`}>
+                        {contract.daysRemaining} days
+                      </span>
+                      {isHighlighted && (
+                        <span className="text-yellow-400 text-xs">🎤</span>
+                      )}
+                    </div>
+                  </div>
                 );
               })}
             </div>
           </div>
 
-          {/* Contract Highlights */}
+          {/* Medium Risk Contracts */}
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+            <h3 className="text-xl font-bold text-white mb-4 flex items-center">
+              <Shield className="h-5 w-5 text-yellow-400 mr-2" />
+              Medium Risk Contracts
+            </h3>
+            <div className="space-y-2">
+              {contractHighlights.filter(contract => contract.riskLevel === 'Medium').map((contract, index) => {
+                const isHighlighted = isPlayerHighlighted(contract.player);
+                return (
+                  <div 
+                    key={index} 
+                    className={`flex items-center justify-between p-3 rounded-lg transition-all duration-300 ${
+                      isHighlighted 
+                        ? 'bg-yellow-500/20 border border-yellow-400 shadow-lg shadow-yellow-400/20 animate-pulse' 
+                        : 'bg-yellow-500/10 border border-yellow-500/20 hover:bg-yellow-500/15'
+                    }`}
+                  >
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className="flex items-center gap-2">
+                        <h4 className={`font-semibold ${isHighlighted ? 'text-yellow-100' : 'text-white'}`}>
+                          {contract.player}
+                          {isHighlighted && <span className="text-yellow-400">⭐</span>}
+                        </h4>
+                        <span className="text-xs text-gray-300">{contract.position}</span>
+                      </div>
+                      <span className="text-sm text-blue-200">{contract.currentWage}</span>
+                      <span className="text-sm text-blue-200">{contract.contractEnd}</span>
+                      <span className="text-sm text-yellow-200 truncate max-w-xs">{contract.keyClause}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs px-2 py-1 rounded font-medium ${
+                        isHighlighted ? 'bg-yellow-500 text-white' : 'bg-yellow-600 text-white'
+                      }`}>
+                        {contract.riskLevel} Risk
+                      </span>
+                      {isHighlighted && (
+                        <span className="text-yellow-400 text-xs">🎤</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Low Risk Contracts */}
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
             <h3 className="text-xl font-bold text-white mb-4 flex items-center">
               <Shield className="h-5 w-5 text-green-400 mr-2" />
               Secure Contracts
             </h3>
-            <div className="space-y-4">
-              {contractHighlights.map((contract, index) => {
+            <div className="space-y-2">
+              {contractHighlights.filter(contract => contract.riskLevel === 'Low').map((contract, index) => {
                 const isHighlighted = isPlayerHighlighted(contract.player);
                 return (
                   <div 
                     key={index} 
-                    className={`rounded-lg p-4 transition-all duration-300 ${
+                    className={`flex items-center justify-between p-3 rounded-lg transition-all duration-300 ${
                       isHighlighted 
-                        ? 'bg-yellow-500/20 border-2 border-yellow-400 shadow-lg shadow-yellow-400/20 animate-pulse' 
-                        : 'bg-green-500/10 border border-green-500/20'
+                        ? 'bg-yellow-500/20 border border-yellow-400 shadow-lg shadow-yellow-400/20 animate-pulse' 
+                        : 'bg-green-500/10 border border-green-500/20 hover:bg-green-500/15'
                     }`}
                   >
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className="flex items-center gap-2">
                         <h4 className={`font-semibold ${isHighlighted ? 'text-yellow-100' : 'text-white'}`}>
                           {contract.player}
-                          {isHighlighted && <span className="ml-2 text-yellow-400">⭐</span>}
+                          {isHighlighted && <span className="text-yellow-400">⭐</span>}
                         </h4>
-                        <p className={`text-sm ${isHighlighted ? 'text-yellow-200' : 'text-green-200'}`}>
-                          {contract.position}
-                        </p>
-                    </div>
-                    <span className={`text-xs px-2 py-1 rounded ${
-                        isHighlighted ? 'bg-yellow-500 text-white' :
-                      contract.riskLevel === 'Low' ? 'bg-green-500 text-white' :
-                      contract.riskLevel === 'Medium' ? 'bg-yellow-500 text-white' :
-                      'bg-red-500 text-white'
-                    }`}>
-                      {contract.riskLevel} Risk
-                    </span>
-                  </div>
-                  <div className="space-y-1 text-sm">
-                    <p className="text-blue-200">Wage: {contract.currentWage}</p>
-                    <p className="text-blue-200">Until: {contract.contractEnd}</p>
-                    <p className="text-yellow-200">{contract.keyClause}</p>
-                  </div>
-                    {isHighlighted && (
-                      <div className="mt-2 pt-2 border-t border-yellow-400/30">
-                        <p className="text-yellow-200 text-xs font-medium">🎤 Highlighted by NICO</p>
+                        <span className="text-xs text-gray-300">{contract.position}</span>
                       </div>
-                    )}
-                </div>
+                      <span className="text-sm text-blue-200">{contract.currentWage}</span>
+                      <span className="text-sm text-blue-200">{contract.contractEnd}</span>
+                      <span className="text-sm text-green-200 truncate max-w-xs">{contract.keyClause}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs px-2 py-1 rounded font-medium ${
+                        isHighlighted ? 'bg-yellow-500 text-white' : 'bg-green-600 text-white'
+                      }`}>
+                        {contract.riskLevel} Risk
+                      </span>
+                      {isHighlighted && (
+                        <span className="text-yellow-400 text-xs">🎤</span>
+                      )}
+                    </div>
+                  </div>
                 );
               })}
             </div>

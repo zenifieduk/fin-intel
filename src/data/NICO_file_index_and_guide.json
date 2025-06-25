@@ -1,0 +1,165 @@
+{
+  "project": "NICO - Manchester United Season Forecasting",
+  "season": "2025/26",
+  "created_date": "2025-06-20",
+  "total_files": 4,
+  "description": "Complete dataset for Manchester United season forecasting including fixtures, squad, individual player statistics, and aggregated analysis",
+  "files": [
+    {
+      "filename": "manchester_united_fixtures_2025_26.json",
+      "description": "Complete fixture list for Premier League 2025/26 season",
+      "record_count": 38,
+      "key_fields": [
+        "matchday",
+        "date",
+        "opponent",
+        "venue",
+        "home_score",
+        "away_score"
+      ],
+      "usage": "Base fixture data for match scheduling and opponent analysis",
+      "data_type": "Reference Data"
+    },
+    {
+      "filename": "manchester_united_squad_2025_26.json",
+      "description": "20-player squad with detailed player attributes",
+      "record_count": 20,
+      "key_fields": [
+        "player_id",
+        "name",
+        "position",
+        "age",
+        "market_value_millions",
+        "injury_proneness",
+        "fitness_rating"
+      ],
+      "usage": "Player master data for performance modeling and financial analysis",
+      "data_type": "Master Data"
+    },
+    {
+      "filename": "manchester_united_player_stats_2025_26.json",
+      "description": "Mock statistics for each player for each game (760 total records)",
+      "record_count": 760,
+      "key_fields": [
+        "player_id",
+        "matchday",
+        "minutes_played",
+        "goals_scored",
+        "assists",
+        "clean_sheet",
+        "injury_occurred"
+      ],
+      "usage": "Detailed performance data for forecasting individual and team metrics",
+      "data_type": "Transactional Data"
+    },
+    {
+      "filename": "manchester_united_season_analysis_2025_26.json",
+      "description": "Aggregated projections and analysis based on mock statistics",
+      "record_count": "Multiple aggregated views",
+      "key_fields": [
+        "team_projections",
+        "top_scorers_projected",
+        "injury_risk_analysis",
+        "home_away_comparison"
+      ],
+      "usage": "High-level insights and projections for executive reporting",
+      "data_type": "Analytical Data"
+    }
+  ],
+  "data_relationships": {
+    "primary_keys": {
+      "fixtures": "matchday",
+      "squad": "player_id",
+      "player_stats": "player_id + matchday",
+      "analysis": "derived from player_stats"
+    },
+    "relationships": [
+      "player_stats.player_id \u2192 squad.player_id",
+      "player_stats.matchday \u2192 fixtures.matchday",
+      "analysis aggregates from player_stats"
+    ]
+  },
+  "forecasting_use_cases": [
+    {
+      "use_case": "Performance Forecasting",
+      "description": "Predict individual player performance metrics",
+      "primary_files": [
+        "manchester_united_player_stats_2025_26.json",
+        "manchester_united_squad_2025_26.json"
+      ],
+      "key_metrics": [
+        "goals_scored",
+        "assists",
+        "minutes_played"
+      ],
+      "sample_query": "Average goals per game for forwards vs. midfielders"
+    },
+    {
+      "use_case": "Injury Risk Assessment",
+      "description": "Analyze injury patterns and player availability",
+      "primary_files": [
+        "manchester_united_squad_2025_26.json",
+        "manchester_united_player_stats_2025_26.json"
+      ],
+      "key_metrics": [
+        "injury_proneness",
+        "injury_occurred",
+        "minutes_played"
+      ],
+      "sample_query": "Players with highest injury risk and impact on team performance"
+    },
+    {
+      "use_case": "Match Outcome Prediction",
+      "description": "Predict match results based on player availability and form",
+      "primary_files": [
+        "manchester_united_fixtures_2025_26.json",
+        "manchester_united_player_stats_2025_26.json"
+      ],
+      "key_metrics": [
+        "goals_scored",
+        "clean_sheet",
+        "venue"
+      ],
+      "sample_query": "Home vs away performance against top 6 teams"
+    },
+    {
+      "use_case": "Financial Impact Analysis",
+      "description": "Link player performance to commercial and financial metrics",
+      "primary_files": [
+        "manchester_united_squad_2025_26.json",
+        "manchester_united_player_stats_2025_26.json"
+      ],
+      "key_metrics": [
+        "market_value_millions",
+        "goals_scored",
+        "assists"
+      ],
+      "sample_query": "ROI on player investments based on performance"
+    }
+  ],
+  "data_quality_notes": [
+    "All statistics are mock data generated for forecasting purposes",
+    "Player attributes based on realistic 2025/26 season expectations",
+    "Injury probabilities and fitness ratings are estimates",
+    "Statistics include randomization to simulate season variability",
+    "Home/away and opponent strength factors included in mock data generation"
+  ],
+  "integration_guide": {
+    "recommended_workflow": [
+      "1. Load squad data to understand player profiles and attributes",
+      "2. Reference fixtures for match scheduling and opponent analysis",
+      "3. Analyze player_stats for detailed performance patterns",
+      "4. Use season_analysis for high-level projections and insights"
+    ],
+    "sample_integrations": [
+      "Join squad + player_stats for performance vs. player attributes analysis",
+      "Join fixtures + player_stats for home/away and opponent difficulty analysis",
+      "Use analysis file for dashboard creation and executive reporting"
+    ]
+  },
+  "contract_data_integration": {
+    "note": "You mentioned having contract data for 3 players",
+    "recommended_approach": "Create additional JSON file with contract details (salary, bonuses, clauses) and link via player_id",
+    "financial_modeling": "Combine contract costs with performance projections for comprehensive financial forecasting"
+  }
+}

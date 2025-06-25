@@ -1,0 +1,622 @@
+{
+  "team": "Manchester United",
+  "season": "2025/26",
+  "analysis_date": "2025-06-20",
+  "description": "Season projections and key metrics based on mock player statistics",
+  "team_projections": {
+    "total_goals_projected": 44,
+    "total_assists_projected": 60,
+    "clean_sheets_projected": 57,
+    "total_yellow_cards": 26,
+    "total_red_cards": 4,
+    "injury_incidents": 95
+  },
+  "top_scorers_projected": [
+    {
+      "player_id": 15,
+      "player_name": "Alejandro Garnacho",
+      "projected_goals": 6,
+      "projected_minutes": 1591
+    },
+    {
+      "player_id": 12,
+      "player_name": "Mason Mount",
+      "projected_goals": 5,
+      "projected_minutes": 2012
+    },
+    {
+      "player_id": 18,
+      "player_name": "Joshua Zirkzee",
+      "projected_goals": 5,
+      "projected_minutes": 1205
+    },
+    {
+      "player_id": 10,
+      "player_name": "Bruno Fernandes",
+      "projected_goals": 4,
+      "projected_minutes": 2080
+    },
+    {
+      "player_id": 19,
+      "player_name": "Antony",
+      "projected_goals": 4,
+      "projected_minutes": 1444
+    },
+    {
+      "player_id": 20,
+      "player_name": "Matheus Cunha",
+      "projected_goals": 3,
+      "projected_minutes": 1297
+    },
+    {
+      "player_id": 4,
+      "player_name": "Lisandro Mart\u00ednez",
+      "projected_goals": 2,
+      "projected_minutes": 2041
+    },
+    {
+      "player_id": 8,
+      "player_name": "Noussair Mazraoui",
+      "projected_goals": 2,
+      "projected_minutes": 1755
+    },
+    {
+      "player_id": 9,
+      "player_name": "Kobbie Mainoo",
+      "projected_goals": 2,
+      "projected_minutes": 1780
+    },
+    {
+      "player_id": 13,
+      "player_name": "Manuel Ugarte",
+      "projected_goals": 2,
+      "projected_minutes": 1514
+    }
+  ],
+  "top_assisters_projected": [
+    {
+      "player_id": 9,
+      "player_name": "Kobbie Mainoo",
+      "projected_assists": 7,
+      "projected_minutes": 1780
+    },
+    {
+      "player_id": 10,
+      "player_name": "Bruno Fernandes",
+      "projected_assists": 7,
+      "projected_minutes": 2080
+    },
+    {
+      "player_id": 12,
+      "player_name": "Mason Mount",
+      "projected_assists": 7,
+      "projected_minutes": 2012
+    },
+    {
+      "player_id": 3,
+      "player_name": "Diogo Dalot",
+      "projected_assists": 5,
+      "projected_minutes": 2255
+    },
+    {
+      "player_id": 8,
+      "player_name": "Noussair Mazraoui",
+      "projected_assists": 5,
+      "projected_minutes": 1755
+    },
+    {
+      "player_id": 19,
+      "player_name": "Antony",
+      "projected_assists": 4,
+      "projected_minutes": 1444
+    },
+    {
+      "player_id": 20,
+      "player_name": "Matheus Cunha",
+      "projected_assists": 4,
+      "projected_minutes": 1297
+    },
+    {
+      "player_id": 6,
+      "player_name": "Harry Maguire",
+      "projected_assists": 3,
+      "projected_minutes": 1667
+    },
+    {
+      "player_id": 13,
+      "player_name": "Manuel Ugarte",
+      "projected_assists": 3,
+      "projected_minutes": 1514
+    },
+    {
+      "player_id": 15,
+      "player_name": "Alejandro Garnacho",
+      "projected_assists": 3,
+      "projected_minutes": 1591
+    }
+  ],
+  "most_minutes_projected": [
+    {
+      "player_id": 3,
+      "player_name": "Diogo Dalot",
+      "projected_minutes": 2255,
+      "games_projected": 25
+    },
+    {
+      "player_id": 2,
+      "player_name": "Altay Bay\u0131nd\u0131r",
+      "projected_minutes": 2160,
+      "games_projected": 24
+    },
+    {
+      "player_id": 10,
+      "player_name": "Bruno Fernandes",
+      "projected_minutes": 2080,
+      "games_projected": 23
+    },
+    {
+      "player_id": 1,
+      "player_name": "Andr\u00e9 Onana",
+      "projected_minutes": 2070,
+      "games_projected": 23
+    },
+    {
+      "player_id": 4,
+      "player_name": "Lisandro Mart\u00ednez",
+      "projected_minutes": 2041,
+      "games_projected": 22
+    },
+    {
+      "player_id": 5,
+      "player_name": "Matthijs de Ligt",
+      "projected_minutes": 2031,
+      "games_projected": 22
+    },
+    {
+      "player_id": 12,
+      "player_name": "Mason Mount",
+      "projected_minutes": 2012,
+      "games_projected": 22
+    },
+    {
+      "player_id": 7,
+      "player_name": "Luke Shaw",
+      "projected_minutes": 1807,
+      "games_projected": 20
+    },
+    {
+      "player_id": 9,
+      "player_name": "Kobbie Mainoo",
+      "projected_minutes": 1780,
+      "games_projected": 19
+    },
+    {
+      "player_id": 8,
+      "player_name": "Noussair Mazraoui",
+      "projected_minutes": 1755,
+      "games_projected": 19
+    }
+  ],
+  "injury_risk_analysis": [
+    {
+      "player_id": 1,
+      "player_name": "Andr\u00e9 Onana",
+      "projected_injury_incidents": 3,
+      "games_missed_due_injury": 3,
+      "availability_percentage": 92.1
+    },
+    {
+      "player_id": 2,
+      "player_name": "Altay Bay\u0131nd\u0131r",
+      "projected_injury_incidents": 2,
+      "games_missed_due_injury": 2,
+      "availability_percentage": 94.7
+    },
+    {
+      "player_id": 3,
+      "player_name": "Diogo Dalot",
+      "projected_injury_incidents": 3,
+      "games_missed_due_injury": 3,
+      "availability_percentage": 92.1
+    },
+    {
+      "player_id": 4,
+      "player_name": "Lisandro Mart\u00ednez",
+      "projected_injury_incidents": 7,
+      "games_missed_due_injury": 7,
+      "availability_percentage": 81.6
+    },
+    {
+      "player_id": 5,
+      "player_name": "Matthijs de Ligt",
+      "projected_injury_incidents": 4,
+      "games_missed_due_injury": 4,
+      "availability_percentage": 89.5
+    },
+    {
+      "player_id": 6,
+      "player_name": "Harry Maguire",
+      "projected_injury_incidents": 8,
+      "games_missed_due_injury": 8,
+      "availability_percentage": 78.9
+    },
+    {
+      "player_id": 7,
+      "player_name": "Luke Shaw",
+      "projected_injury_incidents": 6,
+      "games_missed_due_injury": 6,
+      "availability_percentage": 84.2
+    },
+    {
+      "player_id": 8,
+      "player_name": "Noussair Mazraoui",
+      "projected_injury_incidents": 2,
+      "games_missed_due_injury": 2,
+      "availability_percentage": 94.7
+    },
+    {
+      "player_id": 9,
+      "player_name": "Kobbie Mainoo",
+      "projected_injury_incidents": 6,
+      "games_missed_due_injury": 6,
+      "availability_percentage": 84.2
+    },
+    {
+      "player_id": 10,
+      "player_name": "Bruno Fernandes",
+      "projected_injury_incidents": 1,
+      "games_missed_due_injury": 1,
+      "availability_percentage": 97.4
+    },
+    {
+      "player_id": 11,
+      "player_name": "Casemiro",
+      "projected_injury_incidents": 8,
+      "games_missed_due_injury": 8,
+      "availability_percentage": 78.9
+    },
+    {
+      "player_id": 12,
+      "player_name": "Mason Mount",
+      "projected_injury_incidents": 6,
+      "games_missed_due_injury": 6,
+      "availability_percentage": 84.2
+    },
+    {
+      "player_id": 13,
+      "player_name": "Manuel Ugarte",
+      "projected_injury_incidents": 5,
+      "games_missed_due_injury": 5,
+      "availability_percentage": 86.8
+    },
+    {
+      "player_id": 14,
+      "player_name": "Amad Diallo",
+      "projected_injury_incidents": 8,
+      "games_missed_due_injury": 8,
+      "availability_percentage": 78.9
+    },
+    {
+      "player_id": 15,
+      "player_name": "Alejandro Garnacho",
+      "projected_injury_incidents": 3,
+      "games_missed_due_injury": 3,
+      "availability_percentage": 92.1
+    },
+    {
+      "player_id": 16,
+      "player_name": "Marcus Rashford",
+      "projected_injury_incidents": 3,
+      "games_missed_due_injury": 3,
+      "availability_percentage": 92.1
+    },
+    {
+      "player_id": 17,
+      "player_name": "Rasmus H\u00f8jlund",
+      "projected_injury_incidents": 3,
+      "games_missed_due_injury": 3,
+      "availability_percentage": 92.1
+    },
+    {
+      "player_id": 18,
+      "player_name": "Joshua Zirkzee",
+      "projected_injury_incidents": 7,
+      "games_missed_due_injury": 7,
+      "availability_percentage": 81.6
+    },
+    {
+      "player_id": 19,
+      "player_name": "Antony",
+      "projected_injury_incidents": 4,
+      "games_missed_due_injury": 4,
+      "availability_percentage": 89.5
+    },
+    {
+      "player_id": 20,
+      "player_name": "Matheus Cunha",
+      "projected_injury_incidents": 6,
+      "games_missed_due_injury": 6,
+      "availability_percentage": 84.2
+    }
+  ],
+  "matchday_breakdown": [
+    {
+      "matchday": 1,
+      "total_goals": 0,
+      "total_assists": 2,
+      "players_available": 19,
+      "injury_incidents": 1
+    },
+    {
+      "matchday": 2,
+      "total_goals": 0,
+      "total_assists": 1,
+      "players_available": 16,
+      "injury_incidents": 3
+    },
+    {
+      "matchday": 3,
+      "total_goals": 3,
+      "total_assists": 1,
+      "players_available": 19,
+      "injury_incidents": 1
+    },
+    {
+      "matchday": 4,
+      "total_goals": 0,
+      "total_assists": 1,
+      "players_available": 16,
+      "injury_incidents": 3
+    },
+    {
+      "matchday": 5,
+      "total_goals": 0,
+      "total_assists": 2,
+      "players_available": 17,
+      "injury_incidents": 3
+    },
+    {
+      "matchday": 6,
+      "total_goals": 2,
+      "total_assists": 0,
+      "players_available": 16,
+      "injury_incidents": 2
+    },
+    {
+      "matchday": 7,
+      "total_goals": 1,
+      "total_assists": 1,
+      "players_available": 17,
+      "injury_incidents": 1
+    },
+    {
+      "matchday": 8,
+      "total_goals": 0,
+      "total_assists": 2,
+      "players_available": 14,
+      "injury_incidents": 5
+    },
+    {
+      "matchday": 9,
+      "total_goals": 0,
+      "total_assists": 1,
+      "players_available": 15,
+      "injury_incidents": 4
+    },
+    {
+      "matchday": 10,
+      "total_goals": 1,
+      "total_assists": 3,
+      "players_available": 17,
+      "injury_incidents": 3
+    },
+    {
+      "matchday": 11,
+      "total_goals": 3,
+      "total_assists": 2,
+      "players_available": 14,
+      "injury_incidents": 5
+    },
+    {
+      "matchday": 12,
+      "total_goals": 0,
+      "total_assists": 1,
+      "players_available": 18,
+      "injury_incidents": 2
+    },
+    {
+      "matchday": 13,
+      "total_goals": 3,
+      "total_assists": 3,
+      "players_available": 17,
+      "injury_incidents": 2
+    },
+    {
+      "matchday": 14,
+      "total_goals": 0,
+      "total_assists": 1,
+      "players_available": 17,
+      "injury_incidents": 2
+    },
+    {
+      "matchday": 15,
+      "total_goals": 4,
+      "total_assists": 4,
+      "players_available": 16,
+      "injury_incidents": 4
+    },
+    {
+      "matchday": 16,
+      "total_goals": 0,
+      "total_assists": 1,
+      "players_available": 16,
+      "injury_incidents": 4
+    },
+    {
+      "matchday": 17,
+      "total_goals": 1,
+      "total_assists": 2,
+      "players_available": 18,
+      "injury_incidents": 1
+    },
+    {
+      "matchday": 18,
+      "total_goals": 0,
+      "total_assists": 4,
+      "players_available": 16,
+      "injury_incidents": 2
+    },
+    {
+      "matchday": 19,
+      "total_goals": 0,
+      "total_assists": 0,
+      "players_available": 18,
+      "injury_incidents": 2
+    },
+    {
+      "matchday": 20,
+      "total_goals": 2,
+      "total_assists": 1,
+      "players_available": 17,
+      "injury_incidents": 3
+    },
+    {
+      "matchday": 21,
+      "total_goals": 3,
+      "total_assists": 2,
+      "players_available": 15,
+      "injury_incidents": 3
+    },
+    {
+      "matchday": 22,
+      "total_goals": 1,
+      "total_assists": 1,
+      "players_available": 14,
+      "injury_incidents": 4
+    },
+    {
+      "matchday": 23,
+      "total_goals": 0,
+      "total_assists": 2,
+      "players_available": 14,
+      "injury_incidents": 4
+    },
+    {
+      "matchday": 24,
+      "total_goals": 0,
+      "total_assists": 1,
+      "players_available": 16,
+      "injury_incidents": 4
+    },
+    {
+      "matchday": 25,
+      "total_goals": 3,
+      "total_assists": 0,
+      "players_available": 15,
+      "injury_incidents": 4
+    },
+    {
+      "matchday": 26,
+      "total_goals": 3,
+      "total_assists": 1,
+      "players_available": 17,
+      "injury_incidents": 1
+    },
+    {
+      "matchday": 27,
+      "total_goals": 0,
+      "total_assists": 1,
+      "players_available": 19,
+      "injury_incidents": 0
+    },
+    {
+      "matchday": 28,
+      "total_goals": 2,
+      "total_assists": 2,
+      "players_available": 17,
+      "injury_incidents": 2
+    },
+    {
+      "matchday": 29,
+      "total_goals": 0,
+      "total_assists": 2,
+      "players_available": 15,
+      "injury_incidents": 3
+    },
+    {
+      "matchday": 30,
+      "total_goals": 0,
+      "total_assists": 2,
+      "players_available": 18,
+      "injury_incidents": 2
+    },
+    {
+      "matchday": 31,
+      "total_goals": 2,
+      "total_assists": 1,
+      "players_available": 20,
+      "injury_incidents": 0
+    },
+    {
+      "matchday": 32,
+      "total_goals": 1,
+      "total_assists": 1,
+      "players_available": 17,
+      "injury_incidents": 2
+    },
+    {
+      "matchday": 33,
+      "total_goals": 0,
+      "total_assists": 3,
+      "players_available": 18,
+      "injury_incidents": 2
+    },
+    {
+      "matchday": 34,
+      "total_goals": 1,
+      "total_assists": 3,
+      "players_available": 19,
+      "injury_incidents": 1
+    },
+    {
+      "matchday": 35,
+      "total_goals": 1,
+      "total_assists": 2,
+      "players_available": 15,
+      "injury_incidents": 4
+    },
+    {
+      "matchday": 36,
+      "total_goals": 2,
+      "total_assists": 1,
+      "players_available": 18,
+      "injury_incidents": 1
+    },
+    {
+      "matchday": 37,
+      "total_goals": 0,
+      "total_assists": 0,
+      "players_available": 17,
+      "injury_incidents": 2
+    },
+    {
+      "matchday": 38,
+      "total_goals": 5,
+      "total_assists": 2,
+      "players_available": 16,
+      "injury_incidents": 3
+    }
+  ],
+  "home_away_comparison": {
+    "home_performance": {
+      "goals": 33,
+      "assists": 32,
+      "clean_sheets": 29
+    },
+    "away_performance": {
+      "goals": 11,
+      "assists": 28,
+      "clean_sheets": 28
+    }
+  }
+}
