@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useConversation } from '@elevenlabs/react';
 import { useJsonData } from '@/hooks/useJsonData';
+import { useNicoSession } from '@/hooks/useNicoSession';
 import {
   FixturesData,
   SquadData,
@@ -30,11 +31,24 @@ const NICO_MANCHESTER_UNITED_DASHBOARD = () => {
   const { data: analysis, loading: analysisLoading, error: analysisError } = 
     useJsonData<SeasonAnalysisData>('manchester_united_season_analysis_2025_26');
 
+  // NICO Session Management
+  const nicoSession = useNicoSession({
+    userId: 'default-user', // In production, get from auth
+    clubId: 'manchester_united',
+    autoCreate: true,
+    preferences: {
+      responseStyle: 'detailed',
+      analysisDepth: 'detailed',
+      voiceEnabled: true,
+      preferredMetrics: ['goals', 'assists', 'minutes']
+    }
+  });
+
   // NICO Agent State
   const [hasRequestedMicPermission, setHasRequestedMicPermission] = useState(false);
   const [micPermissionGranted, setMicPermissionGranted] = useState<boolean | null>(null);
   
-  // Dashboard interaction state
+  // Dashboard interaction state (now synced with session)
   const [highlightedPlayer, setHighlightedPlayer] = useState<string | null>(null);
   const [nicoActionFeedback, setNicoActionFeedback] = useState<string | null>(null);
   const [currentScenario, setCurrentScenario] = useState<'overview' | 'attack' | 'defense' | 'injuries' | 'fixtures'>('overview');
@@ -47,7 +61,32 @@ const NICO_MANCHESTER_UNITED_DASHBOARD = () => {
     return null;
   }, [fixtures, squad, stats, analysis]);
 
-  // Poll for NICO voice control commands
+  // Sync session context with local state
+  useEffect(() => {
+    if (nicoSession.session?.context) {
+      const context = nicoSession.session.context;
+      
+      // Sync highlighted player
+      if (context.highlightedPlayer !== highlightedPlayer) {
+        setHighlightedPlayer(context.highlightedPlayer);
+        if (context.highlightedPlayer) {
+          setNicoActionFeedback(`🎤 NICO highlighted ${context.highlightedPlayer}`);
+        } else {
+          setNicoActionFeedback(`🎤 NICO cleared player highlight`);
+        }
+        setTimeout(() => setNicoActionFeedback(null), 3000);
+      }
+      
+      // Sync scenario
+      if (context.activeScenario !== currentScenario) {
+        setCurrentScenario(context.activeScenario);
+        setNicoActionFeedback(`🎤 NICO switched to ${context.activeScenario} view`);
+        setTimeout(() => setNicoActionFeedback(null), 3000);
+      }
+    }
+  }, [nicoSession.session?.context, highlightedPlayer, currentScenario]);
+
+  // Poll for NICO voice control commands and sync with session
   useEffect(() => {
     let lastKnownUpdate = Date.now();
     
@@ -68,9 +107,16 @@ const NICO_MANCHESTER_UNITED_DASHBOARD = () => {
             
             console.log('🎮 NICO Command Received (Dashboard):', state);
             
-            // Update highlighted player if changed
+            // Update highlighted player if changed and sync with session
             if (state.highlightedPlayer !== highlightedPlayer) {
               setHighlightedPlayer(state.highlightedPlayer);
+              
+              // Update session storage
+              if (nicoSession.sessionId) {
+                nicoSession.highlightPlayer(state.highlightedPlayer);
+                nicoSession.recordAction(state.highlightedPlayer ? 'voice_highlight_player' : 'voice_clear_highlight');
+              }
+              
               if (state.highlightedPlayer) {
                 setNicoActionFeedback(`🎤 NICO highlighted ${state.highlightedPlayer}`);
               } else {
@@ -89,7 +135,7 @@ const NICO_MANCHESTER_UNITED_DASHBOARD = () => {
     const interval = setInterval(pollForNicoCommands, 5000);
     
     return () => clearInterval(interval);
-  }, [highlightedPlayer]);
+  }, [highlightedPlayer, nicoSession]);
 
   // Agent conversation handlers
   const requestMicrophonePermission = useCallback(async () => {
@@ -138,6 +184,12 @@ const NICO_MANCHESTER_UNITED_DASHBOARD = () => {
       
       console.log('🤖 Starting session with NICO agent: agent_01jy1j8n36ee5rp8t5tv0p2nk7');
       
+      // Update session conversation state
+      if (nicoSession.sessionId) {
+        await nicoSession.updateConversationState('greeting', 'voice_conversation');
+        await nicoSession.addMessage('system', 'Voice conversation started with NICO agent', 'voice_start');
+      }
+      
       await conversation.startSession({
         agentId: 'agent_01jy1j8n36ee5rp8t5tv0p2nk7', // NICO Agent ID
       });
@@ -146,7 +198,7 @@ const NICO_MANCHESTER_UNITED_DASHBOARD = () => {
     } catch (error) {
       console.error('❌ Failed to start conversation with NICO:', error);
     }
-  }, [conversation, hasRequestedMicPermission, requestMicrophonePermission]);
+  }, [conversation, hasRequestedMicPermission, requestMicrophonePermission, nicoSession]);
 
   const endConversation = useCallback(async () => {
     try {
@@ -280,6 +332,30 @@ const NICO_MANCHESTER_UNITED_DASHBOARD = () => {
             Advanced AI-powered analysis of Manchester United&apos;s 2025/26 Premier League campaign
           </p>
           
+          {/* NICO Session Status */}
+          <div className="mt-4 flex justify-center items-center space-x-4">
+            <div className="flex items-center space-x-2 bg-black/20 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/10">
+              <div className={`w-2 h-2 rounded-full ${
+                nicoSession.isConnected ? 'bg-green-400 animate-pulse' : 'bg-red-400'
+              }`}></div>
+              <span className="text-white/80 text-sm">
+                Session: {nicoSession.isConnected ? 'Connected' : 'Disconnected'}
+              </span>
+              {nicoSession.session && (
+                <span className="text-blue-300 text-xs">
+                  ({nicoSession.session.analytics.totalMessages} msgs)
+                </span>
+              )}
+            </div>
+            
+            {conversation.status === 'connected' && (
+              <div className="flex items-center space-x-2 bg-purple-600/20 backdrop-blur-sm rounded-lg px-3 py-2 border border-purple-400/30">
+                <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                <span className="text-purple-200 text-sm">Voice Active</span>
+              </div>
+            )}
+          </div>
+
           {/* NICO Action Feedback */}
           {nicoActionFeedback && (
             <div className="mt-4 mx-auto max-w-md">
@@ -303,7 +379,14 @@ const NICO_MANCHESTER_UNITED_DASHBOARD = () => {
               ].map(({ key, label, icon: Icon }) => (
                 <button
                   key={key}
-                  onClick={() => setCurrentScenario(key as any)}
+                  onClick={async () => {
+                    setCurrentScenario(key as any);
+                    // Update session context
+                    if (nicoSession.sessionId) {
+                      await nicoSession.setScenario(key as any);
+                      await nicoSession.recordAction(`switch_scenario_${key}`);
+                    }
+                  }}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all ${
                     currentScenario === key
                       ? 'bg-blue-600 text-white shadow-lg'

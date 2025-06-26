@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getNicoSessionStorage } from '@/utils/nico-session-storage'
 
 // Voice page control commands for NICO
 interface VoiceControlCommand {
@@ -9,6 +10,7 @@ interface VoiceControlCommand {
   steps?: number
   message?: string
   highlight_player?: string
+  sessionId?: string
 }
 
 // Global state store for voice page (in production, use Redis/database)
@@ -145,6 +147,17 @@ export async function POST(request: NextRequest) {
           voicePageState.highlightedPlayer = command.highlight_player
           voicePageState.lastUpdate = Date.now()
           
+          // Also update NICO session if sessionId provided
+          if (command.sessionId) {
+            try {
+              const nicoStorage = getNicoSessionStorage()
+              await nicoStorage.highlightPlayer(command.sessionId, command.highlight_player)
+              await nicoStorage.recordAction(command.sessionId, `highlight_player_${command.highlight_player}`)
+            } catch (error) {
+              console.error('Failed to update NICO session:', error)
+            }
+          }
+          
           response = {
             success: true,
             message: `Highlighting player: ${command.highlight_player}`,
@@ -154,6 +167,17 @@ export async function POST(request: NextRequest) {
           // Clear highlight if no player specified
           voicePageState.highlightedPlayer = null
           voicePageState.lastUpdate = Date.now()
+          
+          // Also clear from NICO session if sessionId provided
+          if (command.sessionId) {
+            try {
+              const nicoStorage = getNicoSessionStorage()
+              await nicoStorage.highlightPlayer(command.sessionId, null)
+              await nicoStorage.recordAction(command.sessionId, 'clear_player_highlight')
+            } catch (error) {
+              console.error('Failed to update NICO session:', error)
+            }
+          }
           
           response = {
             success: true,

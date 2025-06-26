@@ -13,14 +13,26 @@ DNA-1 is a modern web application built to demonstrate data visualisation capabi
 
 ## ✨ Features
 
+### Core Analytics
 - **Interactive Dashboard** - Comprehensive player assessment interface
 - **Animated Progress Indicators** - Circular progress bars showing percentage completion for each corner
 - **Detailed Metrics** - Individual skill ratings with trend indicators and priority classifications
 - **Historical Trends** - Line charts showing development over time
 - **Radar Charts** - Visual comparison against club averages
 - **Development Planning** - Action plans and coaching recommendations
+
+### NICO AI Assistant
+- **Voice-Controlled Analytics** - ElevenLabs-powered voice interaction for hands-free operation
+- **Persistent Conversations** - Redis + Vector DB session storage for continuous dialogue
+- **Context-Aware Responses** - Remembers player highlights, scenarios, and conversation history
+- **Semantic Search** - Find relevant past conversations and insights
+- **Real-time Dashboard Control** - Voice commands to highlight players and switch scenarios
+- **Multi-Club Ready** - Tenant-isolated storage for different football clubs
+
+### Technical Standards
 - **UK English** - All content uses proper British English spelling
 - **FA Compliant** - Follows official FA methodology and EPPP standards
+- **Enterprise Ready** - Scalable architecture with Redis clustering support
 
 ## 🚀 Tech Stack
 
@@ -75,6 +87,10 @@ Navigate between different assessment areas:
 
 - `/` - Homepage introducing the data visualisation platform
 - `/model` - Interactive FA Four Corner Model dashboard
+- `/nico` - NICO AI-powered Manchester United season forecasting dashboard
+- `/test-nico-session` - NICO session storage testing interface
+- `/contracts` - Premier League contract analysis system
+- `/architecture` - System architecture overview
 
 ## 🏆 FA Four Corner Model
 
